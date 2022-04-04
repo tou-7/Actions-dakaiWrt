@@ -50,7 +50,7 @@ jobs:
         if: env.OpenWrt_OS == 'Lienol' && env.OS_BRANCH != ''
         run: |
           echo "REPO_URL=https://github.com/Lienol/openwrt" >> $GITHUB_ENV
-          echo "REPO_BRANCH=${{OS_BRANCH}}" >> $GITHUB_ENV
+          echo "REPO_BRANCH=${{env.OS_BRANCH}}" >> $GITHUB_ENV
 
       - name: coolsnowwolf lede 
         if: env.OpenWrt_OS == 'Lean'
@@ -68,10 +68,9 @@ jobs:
         if: env.OpenWrt_OS == 'immortalwrt' && env.OS_BRANCH != ''
         run: |
           echo "REPO_URL=https://github.com/immortalwrt/immortalwrt" >> $GITHUB_ENV
-          echo "REPO_BRANCH=${{OS_BRANCH}}" >> $GITHUB_ENV
+          echo "REPO_BRANCH=${{env.OS_BRANCH}}" >> $GITHUB_ENV
           
       - name: Lienol ck
-        if: env.OpenWrt_OS == 'Lienol'
         run: |
           echo "你好"
 
