@@ -45,30 +45,35 @@ jobs:
         run: |
           echo "REPO_URL=https://github.com/Lienol/openwrt" >> $GITHUB_ENV
           echo "REPO_BRANCH=21.02" >> $GITHUB_ENV
+          echo "DIR_NAME=openwrt" >> $GITHUB_ENV
       
       - name: Lienol openwrt 2
         if: env.OpenWrt_OS == 'Lienol' && env.OS_BRANCH != ''
         run: |
           echo "REPO_URL=https://github.com/Lienol/openwrt" >> $GITHUB_ENV
           echo "REPO_BRANCH=${{env.OS_BRANCH}}" >> $GITHUB_ENV
+          echo "DIR_NAME=openwrt" >> $GITHUB_ENV
 
       - name: coolsnowwolf lede 
         if: env.OpenWrt_OS == 'Lean'
         run: |
           echo "REPO_URL=https://github.com/coolsnowwolf/lede" >> $GITHUB_ENV
           echo "REPO_BRANCH=master" >> $GITHUB_ENV
+          echo "DIR_NAME=lean" >> $GITHUB_ENV
       
       - name: 天灵 immortalwrt 1
         if: env.OpenWrt_OS == 'immortalwrt' && env.OS_BRANCH == ''
         run: |
           echo "REPO_URL=https://github.com/immortalwrt/immortalwrt" >> $GITHUB_ENV
           echo "REPO_BRANCH=openwrt-18.06-k5.4" >> $GITHUB_ENV
+          echo "DIR_NAME=immortalwrt" >> $GITHUB_ENV
       
       - name: 天灵 immortalwrt 2
         if: env.OpenWrt_OS == 'immortalwrt' && env.OS_BRANCH != ''
         run: |
           echo "REPO_URL=https://github.com/immortalwrt/immortalwrt" >> $GITHUB_ENV
           echo "REPO_BRANCH=${{env.OS_BRANCH}}" >> $GITHUB_ENV
+          echo "DIR_NAME=immortalwrt" >> $GITHUB_ENV
           
       - name: Lienol ck
         run: |
