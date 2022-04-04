@@ -44,4 +44,10 @@ jobs:
         if: env.OpenWrt_OS == 'Lienol'
         run: |
           echo "date=$(date +'%m.%d.%H')" >> $GITHUB_ENV
-          echo "REPO_URL=&'https://github.com/Lienol/openwrt'" >> $GITHUB_ENV
+          echo "REPO_URL=https://github.com/Lienol/openwrt" >> $GITHUB_ENV
+          
+      - name: Lienol ck
+        if: env.OpenWrt_OS == 'Lienol'
+        run: |
+          echo "你好"
+
