@@ -15,8 +15,8 @@ on:
 env:
   UPLOAD_FIRMWARE: true
   UPLOAD_RELEASE: true
-  OpenWrt_OS: Lienol
-  OS_BRANCH: ''
+  OpenWrt_OS: immortalwrt
+  OS_BRANCH: 'main'
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -40,11 +40,35 @@ jobs:
           echo Add other actions to build,
           echo test, and deploy your project.
           
-      - name: Lienol openwrt
-        if: env.OpenWrt_OS == 'Lienol'
+      - name: Lienol openwrt 1
+        if: env.OpenWrt_OS == 'Lienol' && env.OS_BRANCH == ''
         run: |
-          echo "date=$(date +'%m.%d.%H')" >> $GITHUB_ENV
           echo "REPO_URL=https://github.com/Lienol/openwrt" >> $GITHUB_ENV
+          echo "REPO_BRANCH=21.02" >> $GITHUB_ENV
+      
+      - name: Lienol openwrt 2
+        if: env.OpenWrt_OS == 'Lienol' && env.OS_BRANCH != ''
+        run: |
+          echo "REPO_URL=https://github.com/Lienol/openwrt" >> $GITHUB_ENV
+          echo "REPO_BRANCH=${{OS_BRANCH}}" >> $GITHUB_ENV
+
+      - name: coolsnowwolf lede 
+        if: env.OpenWrt_OS == 'Lean'
+        run: |
+          echo "REPO_URL=https://github.com/coolsnowwolf/lede" >> $GITHUB_ENV
+          echo "REPO_BRANCH=master" >> $GITHUB_ENV
+      
+      - name: 天灵 immortalwrt 1
+        if: env.OpenWrt_OS == 'immortalwrt' && env.OS_BRANCH == ''
+        run: |
+          echo "REPO_URL=https://github.com/immortalwrt/immortalwrt" >> $GITHUB_ENV
+          echo "REPO_BRANCH=openwrt-18.06-k5.4" >> $GITHUB_ENV
+      
+      - name: 天灵 immortalwrt 2
+        if: env.OpenWrt_OS == 'immortalwrt' && env.OS_BRANCH != ''
+        run: |
+          echo "REPO_URL=https://github.com/immortalwrt/immortalwrt" >> $GITHUB_ENV
+          echo "REPO_BRANCH=${{OS_BRANCH}}" >> $GITHUB_ENV
           
       - name: Lienol ck
         if: env.OpenWrt_OS == 'Lienol'
