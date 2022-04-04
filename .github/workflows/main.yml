@@ -42,4 +42,4 @@ jobs:
           
       - name: Lienol openwrt
         if: env.OpenWrt_OS == 'Lienol'
-          echo "REPO_URL=https://github.com/Lienol/openwrt" >> $GITHUB_ENV
+        run: echo "REPO_URL=https://github.com/Lienol/openwrt" >> $GITHUB_ENV
