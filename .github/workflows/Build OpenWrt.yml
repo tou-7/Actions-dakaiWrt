@@ -109,7 +109,7 @@ jobs:
         echo "你好" > ${{env.DIR_NAME}}/bin/targets/rockchip/armv8/openwrt-x86-64-generic-squashfs-combined-efi.img.gz
         echo "你好" > ${{env.DIR_NAME}}/build_dir/target-aarch64_generic_musl/linux-rockchip_armv8/linux-rockchip_armv8/.config
         echo "git clone --depth 1 ${{env.REPO_URL}} -b ${{env.REPO_BRANCH}} ${{env.DIR_NAME}}"
-        echo config/${{matrix.target}}(${{env.OpenWrt_OS}}).config
+        echo "config/${{matrix.target}}(${{env.OpenWrt_OS}}).config"
 
 
     - name: 克隆源代码
@@ -170,8 +170,9 @@ jobs:
       run: |
         mkdir firmware
         mv -f ${{env.DIR_NAME}}/bin/targets/*/*/{*combined*,*sysupgrade*} ./firmware/ 2>/dev/null || true
-        cp ${{env.DIR_NAME}}/.config  ./firmware/${{matrix.target}}(${{env.OpenWrt_OS}},${{env.REPO_BRANCH}}).config
-        cp ${{env.DIR_NAME}}/build_dir/target-*/linux-*/linux-*/.config ./firmware/${{matrix.target}}(${{env.OpenWrt_OS}},${{env.REPO_BRANCH}})_kernel.config
+        # 使用 * 匹配路径不能加双引号,使用括号名称需要双引号
+        cp ${{env.DIR_NAME}}/.config  "./firmware/${{matrix.target}}(${{env.OpenWrt_OS}},${{env.REPO_BRANCH}}).config"
+        cp ${{env.DIR_NAME}}/build_dir/target-*/linux-*/linux-*/.config "./firmware/${{matrix.target}}(${{env.OpenWrt_OS}},${{env.REPO_BRANCH}})_kernel.config"
         cd firmware
         echo "v${{ env.date4 }}" > version.txt
         md5=$((md5sum *squashfs-sysupgrade* || md5sum *squashfs-combined-efi*) | awk '{print $1}') 2>/dev/null
