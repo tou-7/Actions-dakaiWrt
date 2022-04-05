@@ -102,7 +102,7 @@ jobs:
     - name: 伪代码测试
       if: env.test_code == 'true'
       env:
-        CONFIG_FILE: config/${{matrix.target}}\(${{env.OpenWrt_OS}}\).config
+        CONFIG_FILE: "config/${{matrix.target}}(${{env.OpenWrt_OS}}).config"
       run: |
         # sudo -E apt-get -qq update
         # sudo -E apt-get -qq install rename
