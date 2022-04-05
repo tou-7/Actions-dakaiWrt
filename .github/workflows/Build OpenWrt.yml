@@ -180,7 +180,7 @@ jobs:
         rename -v "s/^openwrt/${{ env.VERSION }}-openwrt/" * || true
         rename -v "s/friendlyarm_//" *gz || true
         echo $md5 >> version.txt
-        echo ${{matrix.target}}(${{env.OpenWrt_OS}},${{env.REPO_BRANCH}}) >> version.txt     
+        echo "${{matrix.target}}(${{env.OpenWrt_OS}},${{env.REPO_BRANCH}})" >> version.txt     
         rm -rf sha256sums
         echo "FIRMWARE=$PWD" >> $GITHUB_ENV
 
