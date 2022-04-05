@@ -169,9 +169,9 @@ jobs:
       if: env.UPLOAD_FIRMWARE == 'true' && !cancelled()
       run: |
         mkdir firmware
-        mv -f "${{env.DIR_NAME}}/bin/targets/*/*/{*combined*,*sysupgrade*}" ./firmware/ 2>/dev/null || true
-        cp "${{env.DIR_NAME}}/.config"  ./firmware/${{matrix.target}}(${{env.OpenWrt_OS}},${{env.REPO_BRANCH}}).config
-        cp "${{env.DIR_NAME}}/build_dir/target-*/linux-*/linux-*/.config" ./firmware/${{matrix.target}}(${{env.OpenWrt_OS}},${{env.REPO_BRANCH}})_kernel.config
+        mv -f "${{env.DIR_NAME}}/bin/targets/*/*/{*combined*,*sysupgrade*}" "./firmware/" 2>/dev/null || true
+        cp "${{env.DIR_NAME}}/.config"  "./firmware/${{matrix.target}}(${{env.OpenWrt_OS}},${{env.REPO_BRANCH}}).config"
+        cp "${{env.DIR_NAME}}/build_dir/target-*/linux-*/linux-*/.config" "./firmware/${{matrix.target}}(${{env.OpenWrt_OS}},${{env.REPO_BRANCH}})_kernel.config"
         cd firmware
         echo "v${{ env.date4 }}" > version.txt
         md5=$((md5sum *squashfs-sysupgrade* || md5sum *squashfs-combined-efi*) | awk '{print $1}') 2>/dev/null
@@ -179,7 +179,7 @@ jobs:
         rename -v "s/^openwrt/${{ env.VERSION }}-openwrt/" * || true
         rename -v "s/friendlyarm_//" *gz || true
         echo $md5 >> version.txt
-        echo ${{matrix.target}} >> version.txt     
+        echo ${{matrix.target}}(${{env.OpenWrt_OS}},${{env.REPO_BRANCH}}) >> version.txt     
         rm -rf sha256sums
         echo "FIRMWARE=$PWD" >> $GITHUB_ENV
 
