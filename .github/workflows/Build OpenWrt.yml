@@ -22,7 +22,7 @@ env:
   OpenWrt_OS: immortalwrt
   # OpenWrt_OS: Lienol, Lean, immortalwrt 
   OS_BRANCH: main
-  DelOld_RELEASE: false
+  DelOld_RELEASE: true
   TZ: Asia/Shanghai
   
 jobs:
@@ -182,7 +182,7 @@ jobs:
         echo $md5 >> version.txt
         # rename -v "s/^openwrt/${{ env.VERSION }}-openwrt/" * || true
         # rename -v "s/friendlyarm_//" *gz || true
-        echo $md5 >> version.txt
+        # echo $md5 >> version.txt
         echo ${{matrix.target}}\(${{env.OpenWrt_OS}},${{env.REPO_BRANCH}}\) >> version.txt     
         rm -rf sha256sums
         echo "FIRMWARE=$PWD" >> $GITHUB_ENV
