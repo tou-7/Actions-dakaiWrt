@@ -21,7 +21,6 @@ env:
   UPLOAD_RELEASE: true
   OpenWrt_OS: immortalwrt
   # OpenWrt_OS: Lienol, Lean, immortalwrt 
-  OS_BRANCH: main
   DelOld_RELEASE: true
   TZ: Asia/Shanghai
   
@@ -64,39 +63,34 @@ jobs:
         VERSION="$(echo "${{github.event.action}}" | grep -Eo " [0-9.]+" | sed -e 's/ //')" || true
         [ "$VERSION" ] && echo "VERSION=$VERSION" >> $GITHUB_ENV || echo "VERSION=$(date +'%m.%d')" >> $GITHUB_ENV         
 
-    - name: Lienol openwrt Default
-      if: env.OpenWrt_OS == 'Lienol' && env.OS_BRANCH == ''
+    - name: Lienol openwrt 
+      if: env.OpenWrt_OS == 'Lienol'
+      env:
+        OS_BRANCH: 21.02
+        # OS_BRANCH: 21.02(默认), 19.07
       run: |
         echo "REPO_URL=https://github.com/Lienol/openwrt" >> $GITHUB_ENV
-        echo "REPO_BRANCH=21.02" >> $GITHUB_ENV
-        echo "DIR_NAME=openwrt" >> $GITHUB_ENV
-    
-    - name: Lienol openwrt DIY
-      if: env.OpenWrt_OS == 'Lienol' && env.OS_BRANCH != ''
-      run: |
-        echo "REPO_URL=https://github.com/Lienol/openwrt" >> $GITHUB_ENV
-        echo "REPO_BRANCH=${{env.OS_BRANCH}}" >> $GITHUB_ENV
+        echo "REPO_BRANCH=$OS_BRANCH" >> $GITHUB_ENV
         echo "DIR_NAME=openwrt" >> $GITHUB_ENV
 
     - name: coolsnowwolf  
       if: env.OpenWrt_OS == 'Lean'
+      env:
+        OS_BRANCH: master
+        # OS_BRANCH: 只有一个
       run: |
         echo "REPO_URL=https://github.com/coolsnowwolf/lede" >> $GITHUB_ENV
-        echo "REPO_BRANCH=master" >> $GITHUB_ENV
+        echo "REPO_BRANCH=$OS_BRANCH" >> $GITHUB_ENV
         echo "DIR_NAME=lean" >> $GITHUB_ENV
     
-    - name: 天灵 immortalwrt Default
-      if: env.OpenWrt_OS == 'immortalwrt' && env.OS_BRANCH == ''
+    - name: 天灵 immortalwrt
+      if: env.OpenWrt_OS == 'immortalwrt'
+      env:
+        OS_BRANCH: openwrt-21.02
+        # OS_BRANCH: openwrt-21.02 (默认), openwrt-18.06-k5.4
       run: |
         echo "REPO_URL=https://github.com/immortalwrt/immortalwrt" >> $GITHUB_ENV
-        echo "REPO_BRANCH=openwrt-18.06-k5.4" >> $GITHUB_ENV
-        echo "DIR_NAME=immortalwrt" >> $GITHUB_ENV
-    
-    - name: 天灵 immortalwrt DIY
-      if: env.OpenWrt_OS == 'immortalwrt' && env.OS_BRANCH != ''
-      run: |
-        echo "REPO_URL=https://github.com/immortalwrt/immortalwrt" >> $GITHUB_ENV
-        echo "REPO_BRANCH=${{env.OS_BRANCH}}" >> $GITHUB_ENV
+        echo "REPO_BRANCH=$OS_BRANCH" >> $GITHUB_ENV
         echo "DIR_NAME=immortalwrt" >> $GITHUB_ENV
 
     - name: 伪代码测试 1
