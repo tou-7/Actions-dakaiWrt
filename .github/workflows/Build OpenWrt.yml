@@ -96,7 +96,7 @@ jobs:
     - name: 伪代码测试 1
       if: env.test_code == 'true'
       env:
-        CONFIG_FILE: config/${{matrix.target}}\(${{env.OpenWrt_OS}}\).config
+        CONFIG_FILE: config/${{matrix.target}}\(${{env.OpenWrt_OS}},${{env.REPO_BRANCH}}\).config
       run: |
         # sudo -E apt-get -qq update
         # sudo -E apt-get -qq install rename
@@ -140,10 +140,10 @@ jobs:
     - name: 自定义配置 ${{matrix.target}}
       if: env.test_code == 'false' 
       env:
-        CONFIG_FILE: config/${{matrix.target}}\(${{env.OpenWrt_OS}}\).config
-        # nanopi-r2s(Lienol).config, nanopi-r2s(Lean).config, nanopi-r2s(immortalwrt).config
-        # nanopi-r4s(Lienol).config, nanopi-r4s(Lean).config, nanopi-r4s(immortalwrt).config
-        # x86_64(Lienol).config, x86_64(Lean).config, x86_64(immortalwrt).config
+        CONFIG_FILE: config/${{matrix.target}}\(${{env.OpenWrt_OS}},${{env.REPO_BRANCH}}\).config
+        # nanopi-r2s(Lienol,BRANCH).config, nanopi-r2s(Lean,BRANCH).config, nanopi-r2s(immortalwrt,BRANCH).config
+        # nanopi-r4s(Lienol,BRANCH).config, nanopi-r4s(Lean,BRANCH).config, nanopi-r4s(immortalwrt,BRANCH).config
+        # x86_64(Lienol,BRANCH).config, x86_64(Lean,BRANCH).config, x86_64(immortalwrt,BRANCH).config
       run: |
         [ -e $CONFIG_FILE ] && mv $CONFIG_FILE ${{env.DIR_NAME}}/.config
         chmod +x ./customize.sh && ./customize.sh
