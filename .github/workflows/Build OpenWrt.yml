@@ -232,6 +232,4 @@ jobs:
       with:
         keep_latest: 6
         delete_tags: true
-      env:
-        GITHUB_TOKEN: ${{ secrets.REPO_TOKEN }}
         
