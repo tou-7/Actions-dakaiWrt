@@ -219,7 +219,7 @@ jobs:
       uses: softprops/action-gh-release@v1
       if: steps.tag.outputs.status == 'success' && !cancelled() && env.cancel_workflow == 'false'
       env:
-        GITHUB_TOKEN: read/write
+        GITHUB_TOKEN: none
       with:
         files: "${{ env.FIRMWARE }}/*"
         name: ${{ env.date2 }} ${{matrix.target}}
@@ -237,7 +237,7 @@ jobs:
       if: env.DelOld_RELEASE == 'true' && env.UPLOAD_RELEASE == 'true' && !cancelled() && env.cancel_workflow == 'false'
       # if: env.UPLOAD_RELEASE == 'true' && !cancelled()
       with:
-        keep_latest: 6
+        keep_latest: 3
         delete_tags: true
       env:
         GITHUB_TOKEN: read/write       
