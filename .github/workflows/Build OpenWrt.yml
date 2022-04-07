@@ -116,6 +116,12 @@ jobs:
       run: |
         echo "$(cat .config)"
 
+    - name: 配置检测
+      env:
+        CONFIG_FILE: config/${{matrix.target}}\(${{env.OpenWrt_OS}},${{env.REPO_BRANCH}}\).config      
+      run: |
+        [ -e $CONFIG_FILE ] && SIGTERM/Ctrl-Break
+
     - name: 克隆源代码
       if: env.test_code == 'false' 
       run: |
@@ -193,6 +199,12 @@ jobs:
       id: tag
       if: env.UPLOAD_RELEASE == 'true' && !cancelled()
       run: |
+        echo -e "源项目地址:${{env.env.REPO_URL}}\n" >> release.txt
+        [ ${{env.OpenWrt_OS}} == "Lienol" ] && echo -e "感谢 Lienol 大佬 代码支持\n" >> release.txt
+        [ ${{env.OpenWrt_OS}} == "Lean" ] && echo -e "感谢 Lean 大佬 代码支持\n" >> release.txt
+        [ ${{env.OpenWrt_OS}} == "immortalwrt" ] && echo -e "感谢 天灵 大佬 代码支持\n" >> release.txt
+        echo -e "感谢 kenzok8 大哥 整理的插件\n" >> release.txt
+        echo -e "\n" >> release.txt
         echo -e "${{matrix.target}}(${{env.OpenWrt_OS}},${{env.REPO_BRANCH}})固件下载:\n" >> release.txt
         touch release.txt
         echo "::set-output name=status::success"
