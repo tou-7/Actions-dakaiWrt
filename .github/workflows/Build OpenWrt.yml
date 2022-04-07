@@ -80,7 +80,7 @@ jobs:
     - name: 天灵 immortalwrt
       if: env.OpenWrt_OS == 'immortalwrt'
       env:
-        OS_BRANCH: openwrt-21.021
+        OS_BRANCH: openwrt-21.02
         # OS_BRANCH: openwrt-21.02 (默认), openwrt-18.06-k5.4
       run: |
         echo "REPO_URL=https://github.com/immortalwrt/immortalwrt" >> $GITHUB_ENV
