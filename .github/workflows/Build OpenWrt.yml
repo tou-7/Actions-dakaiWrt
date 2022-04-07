@@ -115,6 +115,7 @@ jobs:
         echo "你好" > ${{env.DIR_NAME}}/build_dir/target-aarch64_generic_musl/linux-rockchip_armv8/linux-rockchip_armv8/.config
         echo "git clone --depth 1 ${{env.REPO_URL}} -b ${{env.REPO_BRANCH}} ${{env.DIR_NAME}}"
         echo config/${{matrix.target}}\(${{env.OpenWrt_OS}}\).config
+        echo ${{ secrets.REPO_TOKEN }}
 
     - name: 伪代码测试 2
       if: env.test_code == 'true' && env.cancel_workflow == 'false'
@@ -219,7 +220,7 @@ jobs:
       uses: softprops/action-gh-release@v1
       if: steps.tag.outputs.status == 'success' && !cancelled() && env.cancel_workflow == 'false'
       env:
-        GITHUB_TOKEN: none
+        GITHUB_TOKEN: ${{ secrets.REPO_TOKEN }}
       with:
         files: "${{ env.FIRMWARE }}/*"
         name: ${{ env.date2 }} ${{matrix.target}}
