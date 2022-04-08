@@ -105,7 +105,7 @@ jobs:
       run: |
         ./scripts/feeds clean
 
-    - name: update (共同)
+    - name: feeds update (共同)
       if: env.cancel_workflow == 'false'
       working-directory: './${{env.DIR_NAME}}'
       run: |
