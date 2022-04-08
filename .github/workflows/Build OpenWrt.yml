@@ -99,24 +99,25 @@ jobs:
         sed -i '$a src-git kenzo https://github.com/kenzok8/openwrt-packages' feeds.conf.default
         sed -i '$a src-git small https://github.com/kenzok8/small' feeds.conf.default
 
-    - name: 更新 & 安装 feeds (Lienol)
+    - name: feeds clean (Lienol)
       if: env.OpenWrt_OS == 'Lienol' && env.cancel_workflow == 'false'
       working-directory: './${{env.DIR_NAME}}'
       run: |
         ./scripts/feeds clean
 
-    - name: 更新 & 安装 feeds (天灵)
-      if: env.OpenWrt_OS == 'immortalwrt' && env.cancel_workflow == 'false'
-      working-directory: './${{env.DIR_NAME}}'
-      run: |
-        ./scripts/feeds update -a
-
-    - name: 更新 & 安装 feeds (共同)
+    - name: update (共同)
       if: env.cancel_workflow == 'false'
       working-directory: './${{env.DIR_NAME}}'
       run: |
-        ./scripts/feeds update -a
-        ./scripts/feeds install -a
+        ./scripts/feeds update -a 2>&1 | tee ../update.log
+        grep erorr ../update.log && echo "cancel_workflow=true" >> $GITHUB_ENV || echo "cancel_workflow=false" >> $GITHUB_ENV 
+    
+    - name: feeds install  (共同)
+      if: env.cancel_workflow == 'false'
+      working-directory: './${{env.DIR_NAME}}'
+      run: |   
+        ./scripts/feeds install -a 2>&1 | tee ../install.log
+        grep erorr ../install.log && echo "cancel_workflow=true" >> $GITHUB_ENV || echo "cancel_workflow=false" >> $GITHUB_ENV 
         
     - name: 自定义配置 ${{matrix.target}}
       if: env.cancel_workflow == 'false'
