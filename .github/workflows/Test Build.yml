@@ -237,9 +237,19 @@ jobs:
       if: env.UPLOAD_RELEASE == 'true' && !cancelled() && env.cancel_workflow == 'false'
       run: |
         echo -e "源项目地址: ${{env.REPO_URL}}" >> release.txt
-        [ ${{env.OpenWrt_OS}} == "Lienol" ] && echo -e "感谢 Lienol大佬 代码支持" >> release.txt
-        [ ${{env.OpenWrt_OS}} == "Lean" ] && echo -e "感谢 Lean大佬 代码支持" >> release.txt
-        [ ${{env.OpenWrt_OS}} == "immortalwrt" ] && echo -e "感谢 天灵大佬 代码支持" >> release.txt
+        if [ ${{env.OpenWrt_OS}} == "Lienol" ] 
+        then
+          echo -e "感谢 Lienol大佬 代码支持" >> release.txt
+        elif [ ${{env.OpenWrt_OS}} == "Lean" ]
+        then
+          echo -e "感谢 Lean大佬 代码支持" >> release.txt
+        elif [ ${{env.OpenWrt_OS}} == "immortalwrt" ]
+          echo -e "感谢 天灵大佬 代码支持" >> release.txt
+        then
+        fi
+        # [ ${{env.OpenWrt_OS}} == "Lienol" ] && echo -e "感谢 Lienol大佬 代码支持" >> release.txt
+        # [ ${{env.OpenWrt_OS}} == "Lean" ] && echo -e "感谢 Lean大佬 代码支持" >> release.txt
+        # [ ${{env.OpenWrt_OS}} == "immortalwrt" ] && echo -e "感谢 天灵大佬 代码支持" >> release.txt
         echo -e "感谢 kenzok8大哥 整理的插件\n" >> release.txt
         echo -e "${{matrix.target}}(${{env.OpenWrt_OS}},${{env.REPO_BRANCH}})固件下载:\n" >> release.txt
         touch release.txt
