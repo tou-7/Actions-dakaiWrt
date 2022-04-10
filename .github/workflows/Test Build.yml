@@ -88,8 +88,8 @@ jobs:
         echo "DIR_NAME=immortalwrt" >> $GITHUB_ENV
 
 
-    - name: OpenWrt 选择
-      if: env.OpenWrt_OS == 'immortalwrt'
+    - name: OpenWrt BRANCH 
+    # Lienol , Lean , immortalwrt
       run: |
         if [ ${{env.OpenWrt_OS}} == "Lienol" ] 
         then
