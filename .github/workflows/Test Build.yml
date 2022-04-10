@@ -100,7 +100,7 @@ jobs:
       run: |
         # sudo -E apt-get -qq update
         # sudo -E apt-get -qq install rename
-        echo "cancel_workflow=true" >> $GITHUB_ENV
+        # echo "cancel_workflow=true" >> $GITHUB_ENV
         mkdir -p ${{env.DIR_NAME}}/bin/targets/rockchip/armv8
         mkdir -p ${{env.DIR_NAME}}/build_dir/target-aarch64_generic_musl/linux-rockchip_armv8/linux-rockchip_armv8
         # echo "你好" > ${{env.DIR_NAME}}/.config
