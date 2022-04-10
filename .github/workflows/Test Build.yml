@@ -114,7 +114,7 @@ jobs:
 
     - name: 伪代码测试 2
       if: env.test_code == 'true' && env.cancel_workflow == 'false'
-      working-directory: './${{env.DIR_NAME}}'
+      working-directory: ./${{env.DIR_NAME}}
       run: |
         echo "$(cat .config)"
 
