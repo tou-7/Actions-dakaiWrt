@@ -91,7 +91,12 @@ jobs:
       env:
         CONFIG_FILE: config/${{matrix.target}}\(${{env.OpenWrt_OS}},${{env.REPO_BRANCH}}\).config      
       run: |
-        [ -e $CONFIG_FILE ] && echo "cancel_workflow=false" >> $GITHUB_ENV || echo "cancel_workflow=true" >> $GITHUB_ENV
+        if [ -e $CONFIG_FILE ] 
+        then
+          echo "cancel_workflow=false" >> $GITHUB_ENV 
+        else  
+          echo "cancel_workflow=true" >> $GITHUB_ENV
+        fi  
         
     - name: 伪代码测试 1
       if: env.test_code == 'true' && env.cancel_workflow == 'false'
