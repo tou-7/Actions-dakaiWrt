@@ -244,8 +244,8 @@ jobs:
         then
           echo -e "感谢 Lean大佬 代码支持" >> release.txt
         elif [ ${{env.OpenWrt_OS}} == "immortalwrt" ]
-          echo -e "感谢 天灵大佬 代码支持" >> release.txt
         then
+          echo -e "感谢 天灵大佬 代码支持" >> release.txt
         fi
         # [ ${{env.OpenWrt_OS}} == "Lienol" ] && echo -e "感谢 Lienol大佬 代码支持" >> release.txt
         # [ ${{env.OpenWrt_OS}} == "Lean" ] && echo -e "感谢 Lean大佬 代码支持" >> release.txt
