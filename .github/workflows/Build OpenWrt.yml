@@ -55,41 +55,43 @@ jobs:
         VERSION="$(echo "${{github.event.action}}" | grep -Eo " [0-9.]+" | sed -e 's/ //')" || true
         [ "$VERSION" ] && echo "VERSION=$VERSION" >> $GITHUB_ENV || echo "VERSION=$(date +'%m.%d')" >> $GITHUB_ENV         
 
-    - name: Lienol openwrt 
-      if: env.OpenWrt_OS == 'Lienol'
-      env:
-        OS_BRANCH: 21.02
-        # OS_BRANCH: 21.02(默认), 19.07
+    - name: OpenWrt BRANCH 
+    # Lienol , Lean , immortalwrt
       run: |
-        echo "REPO_URL=https://github.com/Lienol/openwrt" >> $GITHUB_ENV
-        echo "REPO_BRANCH=$OS_BRANCH" >> $GITHUB_ENV
-        echo "DIR_NAME=openwrt" >> $GITHUB_ENV
-
-    - name: coolsnowwolf  
-      if: env.OpenWrt_OS == 'Lean'
-      env:
-        OS_BRANCH: master
-        # OS_BRANCH: 只有一个
-      run: |
-        echo "REPO_URL=https://github.com/coolsnowwolf/lede" >> $GITHUB_ENV
-        echo "REPO_BRANCH=$OS_BRANCH" >> $GITHUB_ENV
-        echo "DIR_NAME=lean" >> $GITHUB_ENV
-    
-    - name: 天灵 immortalwrt
-      if: env.OpenWrt_OS == 'immortalwrt'
-      env:
-        OS_BRANCH: openwrt-21.02
-        # OS_BRANCH: openwrt-21.02 (默认), openwrt-18.06-k5.4
-      run: |
-        echo "REPO_URL=https://github.com/immortalwrt/immortalwrt" >> $GITHUB_ENV
-        echo "REPO_BRANCH=$OS_BRANCH" >> $GITHUB_ENV
-        echo "DIR_NAME=immortalwrt" >> $GITHUB_ENV
-
+        if [ ${{env.OpenWrt_OS}} == "Lienol" ] 
+        then
+          OS_BRANCH="21.02"
+          # OS_BRANCH: 21.02(默认), 19.07
+          echo "REPO_URL=https://github.com/Lienol/openwrt" >> $GITHUB_ENV
+          echo "REPO_BRANCH=$OS_BRANCH" >> $GITHUB_ENV
+          echo "DIR_NAME=openwrt" >> $GITHUB_ENV
+        elif [ ${{env.OpenWrt_OS}} == "Lean" ]
+        then
+          OS_BRANCH="master"
+           # OS_BRANCH: 只有一个
+          echo "REPO_URL=https://github.com/coolsnowwolf/lede" >> $GITHUB_ENV
+          echo "REPO_BRANCH=$OS_BRANCH" >> $GITHUB_ENV
+          echo "DIR_NAME=lede" >> $GITHUB_ENV
+        elif [ ${{env.OpenWrt_OS}} == "immortalwrt" ]
+        then
+          OS_BRANCH=openwrt-21.02
+          # OS_BRANCH: openwrt-21.02 (默认), openwrt-18.06-k5.4
+          echo "REPO_URL=https://github.com/immortalwrt/immortalwrt" >> $GITHUB_ENV
+          echo "REPO_BRANCH=$OS_BRANCH" >> $GITHUB_ENV
+          echo "DIR_NAME=immortalwrt" >> $GITHUB_ENV
+        fi
+        
     - name: 配置检测
-      env:
-        CONFIG_FILE: config/${{matrix.target}}\(${{env.OpenWrt_OS}},${{env.REPO_BRANCH}}\).config      
+      #env:
+        #CONFIG_FILE: config/${{matrix.target}}\(${{env.OpenWrt_OS}},${{env.REPO_BRANCH}}\).config      
       run: |
-        [ -e $CONFIG_FILE ] && echo "cancel_workflow=false" >> $GITHUB_ENV || echo "cancel_workflow=true" >> $GITHUB_ENV
+        CONFIG_FILE="config/${{matrix.target}}\(${{env.OpenWrt_OS}},${{env.REPO_BRANCH}}\).config" 
+        if [ -e $CONFIG_FILE ] 
+        then
+          echo "cancel_workflow=false" >> $GITHUB_ENV 
+        else  
+          echo "cancel_workflow=true" >> $GITHUB_ENV
+        fi
         
     - name: 克隆源代码
       if: env.cancel_workflow == 'false'
@@ -105,6 +107,24 @@ jobs:
       run: |
         ./scripts/feeds clean
 
+    - name: 更新 & 安装 feeds (共同)
+      if: env.test_code == 'false' && env.cancel_workflow == 'false'
+      working-directory: './${{env.DIR_NAME}}'
+      run: |
+        ./scripts/feeds update -a 2>&1 | tee ../update.log
+        if grep -E -i erorr ../update.log
+        then
+          ./scripts/feeds install -a 2>&1 | tee ../install.log
+          if -E -i grep erorr ../install.log
+          then
+            "cancel_workflow=true" >> $GITHUB_ENV
+          esif
+            "cancel_workflow=false" >> $GITHUB_ENV
+          fi
+        esif
+        echo "cancel_workflow=false" >> $GITHUB_ENV
+        fi
+        
     - name: feeds update (共同)
       if: env.cancel_workflow == 'false'
       working-directory: './${{env.DIR_NAME}}'
@@ -121,12 +141,11 @@ jobs:
         
     - name: 自定义配置 ${{matrix.target}}
       if: env.cancel_workflow == 'false'
-      env:
-        CONFIG_FILE: config/${{matrix.target}}\(${{env.OpenWrt_OS}},${{env.REPO_BRANCH}}\).config
+      run: |
+        CONFIG_FILE="config/${{matrix.target}}\(${{env.OpenWrt_OS}},${{env.REPO_BRANCH}}\).config"
         # nanopi-r2s(Lienol,BRANCH).config, nanopi-r2s(Lean,BRANCH).config, nanopi-r2s(immortalwrt,BRANCH).config
         # nanopi-r4s(Lienol,BRANCH).config, nanopi-r4s(Lean,BRANCH).config, nanopi-r4s(immortalwrt,BRANCH).config
         # x86_64(Lienol,BRANCH).config, x86_64(Lean,BRANCH).config, x86_64(immortalwrt,BRANCH).config
-      run: |
         mv $CONFIG_FILE ${{env.DIR_NAME}}/.config
         # [ -e $CONFIG_FILE ] && mv $CONFIG_FILE ${{env.DIR_NAME}}/.config
         chmod +x ./customize.sh && ./customize.sh
