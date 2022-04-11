@@ -81,9 +81,7 @@ jobs:
           echo "DIR_NAME=immortalwrt" >> $GITHUB_ENV
         fi
         
-    - name: 配置检测
-      #env:
-        #CONFIG_FILE: config/${{matrix.target}}\(${{env.OpenWrt_OS}},${{env.REPO_BRANCH}}\).config      
+    - name: 配置检测    
       run: |
         CONFIG_FILE="config/${{matrix.target}}\(${{env.OpenWrt_OS}},${{env.REPO_BRANCH}}\).config" 
         if [ -e $CONFIG_FILE ] 
@@ -108,37 +106,23 @@ jobs:
         ./scripts/feeds clean
 
     - name: 更新 & 安装 feeds (共同)
-      if: env.test_code == 'false' && env.cancel_workflow == 'false'
+      if: env.cancel_workflow == 'false'
       working-directory: './${{env.DIR_NAME}}'
       run: |
         ./scripts/feeds update -a 2>&1 | tee ../update.log
         if grep -E -i erorr ../update.log
         then
+          echo "cancel_workflow=true" >> $GITHUB_ENV
+        else
           ./scripts/feeds install -a 2>&1 | tee ../install.log
           if -E -i grep erorr ../install.log
           then
-            "cancel_workflow=true" >> $GITHUB_ENV
-          esif
-            "cancel_workflow=false" >> $GITHUB_ENV
+            echo "cancel_workflow=true" >> $GITHUB_ENV
+          else
+            echo "cancel_workflow=false" >> $GITHUB_ENV
           fi
-        esif
-        echo "cancel_workflow=false" >> $GITHUB_ENV
         fi
-        
-    - name: feeds update (共同)
-      if: env.cancel_workflow == 'false'
-      working-directory: './${{env.DIR_NAME}}'
-      run: |
-        ./scripts/feeds update -a 2>&1 | tee ../update.log
-        grep erorr ../update.log && echo "cancel_workflow=true" >> $GITHUB_ENV || echo "cancel_workflow=false" >> $GITHUB_ENV 
-    
-    - name: feeds install  (共同)
-      if: env.cancel_workflow == 'false'
-      working-directory: './${{env.DIR_NAME}}'
-      run: |   
-        ./scripts/feeds install -a 2>&1 | tee ../install.log
-        grep erorr ../install.log && echo "cancel_workflow=true" >> $GITHUB_ENV || echo "cancel_workflow=false" >> $GITHUB_ENV 
-        
+         
     - name: 自定义配置 ${{matrix.target}}
       if: env.cancel_workflow == 'false'
       run: |
@@ -169,7 +153,12 @@ jobs:
     - name: 编译结果检测
       if: env.cancel_workflow == 'false'      
       run: |
-        find ${{env.DIR_NAME}}/bin/targets/*/*/{*combined*,*sysupgrade*} && echo "cancel_workflow=false" >> $GITHUB_ENV || echo "cancel_workflow=true" >> $GITHUB_ENV
+        if find ${{env.DIR_NAME}}/bin/targets/*/*/{*combined*,*sysupgrade*}
+        then
+          echo "cancel_workflow=false" >> $GITHUB_ENV
+        else
+          echo "cancel_workflow=true" >> $GITHUB_ENV
+        if
 
     - name: 检查空间使用情况
       if: (!cancelled()) && env.cancel_workflow == 'false'
@@ -196,9 +185,16 @@ jobs:
       if: env.UPLOAD_RELEASE == 'true' && !cancelled() && env.cancel_workflow == 'false'
       run: |
         echo -e "源项目地址: ${{env.REPO_URL}}" >> release.txt
-        [ ${{env.OpenWrt_OS}} == "Lienol" ] && echo -e "感谢 Lienol大佬 代码支持" >> release.txt
-        [ ${{env.OpenWrt_OS}} == "Lean" ] && echo -e "感谢 Lean大佬 代码支持" >> release.txt
-        [ ${{env.OpenWrt_OS}} == "immortalwrt" ] && echo -e "感谢 天灵大佬 代码支持" >> release.txt
+        if [ ${{env.OpenWrt_OS}} == "Lienol" ] 
+        then
+          echo -e "感谢 Lienol大佬 代码支持" >> release.txt
+        elif [ ${{env.OpenWrt_OS}} == "Lean" ]
+        then
+          echo -e "感谢 Lean大佬 代码支持" >> release.txt
+        elif [ ${{env.OpenWrt_OS}} == "immortalwrt" ]
+        then
+          echo -e "感谢 天灵大佬 代码支持" >> release.txt
+        fi
         echo -e "感谢 kenzok8大哥 整理的插件\n" >> release.txt
         echo -e "${{matrix.target}}(${{env.OpenWrt_OS}},${{env.REPO_BRANCH}})固件下载:\n" >> release.txt
         touch release.txt
