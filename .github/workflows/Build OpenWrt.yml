@@ -54,7 +54,6 @@ jobs:
         echo "date4=$(date +'%m.%d.%H')" >> $GITHUB_ENV
         VERSION="$(echo "${{github.event.action}}" | grep -Eo " [0-9.]+" | sed -e 's/ //')" || true
         [ "$VERSION" ] && echo "VERSION=$VERSION" >> $GITHUB_ENV || echo "VERSION=$(date +'%m.%d')" >> $GITHUB_ENV         
-
     - name: OpenWrt BRANCH 
     # Lienol , Lean , immortalwrt
       run: |
@@ -94,34 +93,36 @@ jobs:
     - name: 克隆源代码
       if: env.cancel_workflow == 'false'
       run: |
-        echo "cancel_workflow=true" >> $GITHUB_ENV
         git clone --depth 1 ${{env.REPO_URL}} -b ${{env.REPO_BRANCH}} ${{env.DIR_NAME}}
         cd ${{env.DIR_NAME}}
         if [ -e scripts/feeds ]
         then
           echo "cancel_workflow=false" >> $GITHUB_ENV
           sed -i '$a src-git kenzo https://github.com/kenzok8/openwrt-packages' feeds.conf.default
-          sed -i '$a src-git small https://github.com/kenzok8/small' feeds.conf.default 
+          sed -i '$a src-git small https://github.com/kenzok8/small' feeds.conf.default
+        else
+          echo "cancel_workflow=true" >> $GITHUB_ENV
         fi
         
-
     - name: feeds clean (Lienol)
       if: env.OpenWrt_OS == 'Lienol' && env.cancel_workflow == 'false'
-      working-directory: './${{env.DIR_NAME}}'
+      working-directory: ./${{env.DIR_NAME}}
       run: |
         ./scripts/feeds clean
-
     - name: feeds update & install  (共同)
       if: env.cancel_workflow == 'false'
-      working-directory: './${{env.DIR_NAME}}'
+      working-directory: ./${{env.DIR_NAME}}
       run: |
-        echo "cancel_workflow=true" >> $GITHUB_ENV
         ./scripts/feeds update -a 2>&1 | tee ../update.log
-        if !(grep -E -i erorr ../update.log)
+        if grep -E -i erorr ../update.log
         then
+          echo "cancel_workflow=true" >> $GITHUB_ENV
+        else
           ./scripts/feeds install -a 2>&1 | tee ../install.log
-          if !(grep -E -i erorr ../install.log)
+          if grep -E -i erorr ../install.log
           then
+            echo "cancel_workflow=true" >> $GITHUB_ENV
+          else
             echo "cancel_workflow=false" >> $GITHUB_ENV
           fi
         fi
@@ -139,22 +140,23 @@ jobs:
        
     - name: 下载包文件
       if: env.cancel_workflow == 'false'
-      working-directory: './${{env.DIR_NAME}}'
+      working-directory: ./${{env.DIR_NAME}}
       run: |
         make download -j$(nproc)
         find dl -size -1024c -exec rm -f {} \;
-
+        
     - name: 编译固件
       if: env.cancel_workflow == 'false'     
-      working-directory: './${{env.DIR_NAME}}'
+      working-directory: ./${{env.DIR_NAME}}
       run: |
-        echo "cancel_workflow=true" >> $GITHUB_ENV
         echo -e "$(($(nproc)+1)) thread compile"
         make -j$(($(nproc)+1)) || make -j1 V=s
         if find ${{env.DIR_NAME}}/bin/targets/*/*/{*combined*,*sysupgrade*}
         then
           echo "::set-output name=status::success"
           echo "cancel_workflow=false" >> $GITHUB_ENV
+        else
+          echo "cancel_workflow=true" >> $GITHUB_ENV
         fi
         
     - name: 检查空间使用情况
@@ -176,7 +178,7 @@ jobs:
         echo ${{matrix.target}}\(${{env.OpenWrt_OS}},${{env.REPO_BRANCH}}\) >> version.txt     
         rm -rf sha256sums
         echo "FIRMWARE=$PWD" >> $GITHUB_ENV
-
+        
     - name: 生成发布标签
       id: tag
       if: env.UPLOAD_RELEASE == 'true' && !cancelled() && env.cancel_workflow == 'false'
@@ -196,7 +198,7 @@ jobs:
         echo -e "${{matrix.target}}(${{env.OpenWrt_OS}},${{env.REPO_BRANCH}})固件下载:\n" >> release.txt
         touch release.txt
         echo "::set-output name=status::success"
-
+        
     - name: 上传固件发布
       uses: softprops/action-gh-release@v1
       if: steps.tag.outputs.status == 'success' && !cancelled() && env.cancel_workflow == 'false'
