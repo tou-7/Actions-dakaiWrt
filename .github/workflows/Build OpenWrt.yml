@@ -94,15 +94,14 @@ jobs:
     - name: 克隆源代码
       if: env.cancel_workflow == 'false'
       run: |
+        echo "cancel_workflow=true" >> $GITHUB_ENV
         git clone --depth 1 ${{env.REPO_URL}} -b ${{env.REPO_BRANCH}} ${{env.DIR_NAME}}
         cd ${{env.DIR_NAME}}
         if [ -e scripts/feeds ]
         then
           echo "cancel_workflow=false" >> $GITHUB_ENV
           sed -i '$a src-git kenzo https://github.com/kenzok8/openwrt-packages' feeds.conf.default
-          sed -i '$a src-git small https://github.com/kenzok8/small' feeds.conf.default
-        else
-          echo "cancel_workflow=true" >> $GITHUB_ENV
+          sed -i '$a src-git small https://github.com/kenzok8/small' feeds.conf.default 
         fi
         
 
@@ -116,16 +115,13 @@ jobs:
       if: env.cancel_workflow == 'false'
       working-directory: './${{env.DIR_NAME}}'
       run: |
+        echo "cancel_workflow=true" >> $GITHUB_ENV
         ./scripts/feeds update -a 2>&1 | tee ../update.log
-        if grep -E -i erorr ../update.log
+        if !(grep -E -i erorr ../update.log)
         then
-          echo "cancel_workflow=true" >> $GITHUB_ENV
-        else
           ./scripts/feeds install -a 2>&1 | tee ../install.log
-          if -E -i grep erorr ../install.log
+          if !(grep -E -i erorr ../install.log)
           then
-            echo "cancel_workflow=true" >> $GITHUB_ENV
-          else
             echo "cancel_workflow=false" >> $GITHUB_ENV
           fi
         fi
@@ -138,7 +134,6 @@ jobs:
         # nanopi-r4s(Lienol,BRANCH).config, nanopi-r4s(Lean,BRANCH).config, nanopi-r4s(immortalwrt,BRANCH).config
         # x86_64(Lienol,BRANCH).config, x86_64(Lean,BRANCH).config, x86_64(immortalwrt,BRANCH).config
         mv $CONFIG_FILE ${{env.DIR_NAME}}/.config
-        # [ -e $CONFIG_FILE ] && mv $CONFIG_FILE ${{env.DIR_NAME}}/.config
         chmod +x ./customize.sh && ./customize.sh
         cd "${{env.DIR_NAME}}" && make defconfig
        
@@ -153,14 +148,13 @@ jobs:
       if: env.cancel_workflow == 'false'     
       working-directory: './${{env.DIR_NAME}}'
       run: |
+        echo "cancel_workflow=true" >> $GITHUB_ENV
         echo -e "$(($(nproc)+1)) thread compile"
         make -j$(($(nproc)+1)) || make -j1 V=s
         if find ${{env.DIR_NAME}}/bin/targets/*/*/{*combined*,*sysupgrade*}
         then
           echo "::set-output name=status::success"
           echo "cancel_workflow=false" >> $GITHUB_ENV
-        else
-          echo "cancel_workflow=true" >> $GITHUB_ENV
         if
         
     - name: 检查空间使用情况
