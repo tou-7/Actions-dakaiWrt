@@ -53,7 +53,8 @@ jobs:
         echo "date3=$(date +'%m.%d')" >> $GITHUB_ENV
         echo "date4=$(date +'%m.%d.%H')" >> $GITHUB_ENV
         VERSION="$(echo "${{github.event.action}}" | grep -Eo " [0-9.]+" | sed -e 's/ //')" || true
-        [ "$VERSION" ] && echo "VERSION=$VERSION" >> $GITHUB_ENV || echo "VERSION=$(date +'%m.%d')" >> $GITHUB_ENV         
+        [ "$VERSION" ] && echo "VERSION=$VERSION" >> $GITHUB_ENV || echo "VERSION=$(date +'%m.%d')" >> $GITHUB_ENV
+        
     - name: OpenWrt BRANCH 
     # Lienol , Lean , immortalwrt
       run: |
