@@ -155,7 +155,7 @@ jobs:
         then
           echo "::set-output name=status::success"
           echo "cancel_workflow=false" >> $GITHUB_ENV
-        if
+        fi
         
     - name: 检查空间使用情况
       if: (!cancelled()) && env.cancel_workflow == 'false'
