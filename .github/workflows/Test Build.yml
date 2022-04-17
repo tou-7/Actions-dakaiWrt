@@ -259,6 +259,8 @@ jobs:
     - name: 上传固件发布
       uses: softprops/action-gh-release@v1
       if: steps.tag.outputs.status == 'success' && !cancelled() && env.cancel_workflow == 'false'
+      env:
+        GITHUB_TOKEN: ${{ secrets.REPO_TOKEN }} #read/write
       with:
         files: "${{ env.FIRMWARE }}/*"
         name: ${{ env.date2 }} ${{matrix.target}}
