@@ -150,6 +150,7 @@ jobs:
       if: env.test_code == 'true' && env.cancel_workflow == 'false'
       working-directory: ./${{env.DIR_NAME}}
       run: |
+        find ${{env.DIR_NAME}}/bin/targets/*/*/{*combined*,*sysupgrade*}
         echo "$(cat .config)"
 
     - name: 克隆源代码
