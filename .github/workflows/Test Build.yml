@@ -276,7 +276,7 @@ jobs:
       if: env.DelOld_RELEASE == 'true' && env.UPLOAD_RELEASE == 'true' && !cancelled() && env.cancel_workflow == 'false'
       # if: env.UPLOAD_RELEASE == 'true' && !cancelled()
       with:
-        keep_latest: 6
+        keep_latest: 0
         delete_tags: true
       env:
         GITHUB_TOKEN: write #read/write
