@@ -144,14 +144,15 @@ jobs:
         echo "你好" > ${{env.DIR_NAME}}/build_dir/target-aarch64_generic_musl/linux-rockchip_armv8/linux-rockchip_armv8/.config
         echo "git clone --depth 1 ${{env.REPO_URL}} -b ${{env.REPO_BRANCH}} ${{env.DIR_NAME}}"
         echo config/${{matrix.target}}\(${{env.OpenWrt_OS}}\).config
-        echo ${{ secrets.REPO_TOKEN }}
+        #echo ${{ secrets.REPO_TOKEN }}
 
     - name: 伪代码测试 2
       if: env.test_code == 'true' && env.cancel_workflow == 'false'
       working-directory: ./${{env.DIR_NAME}}
       run: |
-        find bin/targets/*/*/{*combined*,*sysupgrade*}
         echo "$(cat .config)"
+        find bin/targets/*/*/{*combined*,*sysupgrade*}
+        
 
     - name: 克隆源代码
       if: env.test_code == 'false' && env.cancel_workflow == 'false'
