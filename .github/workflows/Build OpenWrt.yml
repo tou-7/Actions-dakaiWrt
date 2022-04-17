@@ -153,7 +153,7 @@ jobs:
       run: |
         echo -e "$(($(nproc)+1)) thread compile"
         make -j$(($(nproc)+1)) || make -j1 V=s
-        if find bin/targets/*/*/{*combined*,*sysupgrade*}
+        if find bin/targets/*/*/*combined* || find bin/targets/*/*/*sysupgrade*
         then
           echo "::set-output name=status::success"
           echo "cancel_workflow=false" >> $GITHUB_ENV
