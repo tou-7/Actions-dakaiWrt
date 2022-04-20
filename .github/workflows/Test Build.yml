@@ -19,9 +19,40 @@ env:
   TZ: Asia/Shanghai
   
 jobs:
+  job1:
+    runs-on: ubuntu-latest
+    outputs:
+      target: ${{ steps.step1.outputs.target }}
+      os: ${{ steps.step1.outputs.os }}
+      branch: ${{ steps.step1.outputs.branch }}
+    steps:
+    - id: step1
+      run: |
+        if grep -E "matrix_target=.*?"  OpenWrtSet.txt
+        then
+          target="$(grep -E "matrix_target=.*?"  OpenWrtSet.txt | head -n 1 | sed -e 's/^matrix_target=//')"
+          echo "::set-output name=target::$target"    
+        else
+          echo "::set-output name=target::Null1"
+        fi       
+        if grep -E "OpenWrt_OS=.*?"  OpenWrtSet.txt
+        then
+          OS="$(grep -E "OpenWrt_OS=.*?"  OpenWrtSet.txt | head -n 1 | sed -e 's/^OpenWrt_OS=//')"
+           echo "::set-output name=os::$OS"          
+        else
+           echo "::set-output name=os::Null2" 
+        fi      
+        if grep -E "OS_BRANCH=.*?"  OpenWrtSet.txt
+        then
+          OS_BRANCH="$(grep -i -E "OS_BRANCH=.*?"  OpenWrtSet.txt |head -n 1| sed -e 's/^OS_BRANCH=//')"
+          echo "::set-output name=branch::$OS_BRANCH" 
+        else
+          echo "::set-output name=branch::Null3" 
+        fi        
   merge:
     runs-on: Ubuntu-20.04
     if: github.event.repository.owner.id == github.event.sender.id
+    needs: job1
 
     name: Build ${{matrix.target}}
     strategy:
@@ -87,41 +118,14 @@ jobs:
         echo "REPO_BRANCH=$OS_BRANCH" >> $GITHUB_ENV
         echo "DIR_NAME=immortalwrt" >> $GITHUB_ENV
 
-    - name: matrix_target
-      run: |
-        if grep -E "matrix_target=.*?"  OpenWrtSet.txt
-        then
-          target="$(grep -E "matrix_target=.*?"  OpenWrtSet.txt | head -n 1 | sed -e 's/^matrix_target=//')"
-          echo "matrix_target=$target" >> $GITHUB_ENV          
-        else
-          echo "cancel_workflow=true" >> $GITHUB_ENV
-        fi  
-
-    - name: OpenWrt_OS
-      if: cancel_workflow == 'false'
-      run: |
-        if grep -E "OpenWrt_OS=.*?"  OpenWrtSet.txt
-        then
-          OS="$(grep -E "OpenWrt_OS=.*?"  OpenWrtSet.txt | head -n 1 | sed -e 's/^OpenWrt_OS=//')"
-          echo "OpenWrt_OS=$OS" >> $GITHUB_ENV          
-        else
-          echo "cancel_workflow=true" >> $GITHUB_ENV
-        fi  
-        
 
     - name: OpenWrt BRANCH
       if: cancel_workflow == 'false'
     # Lienol , Lean , immortalwrt
       run: |
-        if grep -E "OS_BRANCH=.*?"  OpenWrtSet.txt
-        then
-          OS_BRANCH="$(grep -i -E "OS_BRANCH=.*?"  OpenWrtSet.txt |head -n 1| sed -e 's/^OS_BRANCH=//')"
-        else
-          OS_BRANCH=''
-        fi
         if [ ${{env.OpenWrt_OS}} == "Lienol" ] 
         then
-          if OS_BRANCH == "";then OS_BRANCH="21.02"; fi
+          OS_BRANCH="21.02"
           # OS_BRANCH: 21.02(默认), 19.07
           echo "REPO_URL=https://github.com/Lienol/openwrt" >> $GITHUB_ENV
           echo "REPO_BRANCH=$OS_BRANCH" >> $GITHUB_ENV
@@ -135,7 +139,7 @@ jobs:
           echo "DIR_NAME=lede" >> $GITHUB_ENV
         elif [ ${{env.OpenWrt_OS}} == "immortalwrt" ]
         then
-          if OS_BRANCH == "";then OS_BRANCH="openwrt-21.02"; fi
+          OS_BRANCH="openwrt-21.02"
           # OS_BRANCH: openwrt-21.02 (默认), openwrt-18.06-k5.4
           echo "REPO_URL=https://github.com/immortalwrt/immortalwrt" >> $GITHUB_ENV
           echo "REPO_BRANCH=$OS_BRANCH" >> $GITHUB_ENV
@@ -172,6 +176,9 @@ jobs:
         echo "你好" > ${{env.DIR_NAME}}/build_dir/target-aarch64_generic_musl/linux-rockchip_armv8/linux-rockchip_armv8/.config
         echo "git clone --depth 1 ${{env.REPO_URL}} -b ${{env.REPO_BRANCH}} ${{env.DIR_NAME}}"
         echo config/${{matrix.target}}\(${{env.OpenWrt_OS}}\).config
+        echo 目标 ${{needs.job1.outputs.target}}
+        echo 版本 ${{needs.job1.outputs.os}}
+        echo 分支 ${{needs.job1.outputs.branch}}
         #echo ${{ secrets.REPO_TOKEN }}
 
     - name: 伪代码测试 2
