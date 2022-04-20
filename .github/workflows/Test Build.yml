@@ -120,7 +120,6 @@ jobs:
 
 
     - name: OpenWrt BRANCH
-      if: cancel_workflow == 'false'
     # Lienol , Lean , immortalwrt
       run: |
         if [ ${{env.OpenWrt_OS}} == "Lienol" ] 
