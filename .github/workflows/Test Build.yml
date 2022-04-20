@@ -25,7 +25,12 @@ jobs:
       target: ${{ steps.step1.outputs.target }}
       os: ${{ steps.step1.outputs.os }}
       branch: ${{ steps.step1.outputs.branch }}
+    
     steps:
+    
+    - name: Checkout
+      uses: actions/checkout@main
+      
     - id: step1
       run: |
         if grep -E "matrix_target=.*?"  OpenWrtSet.txt
