@@ -87,13 +87,41 @@ jobs:
         echo "REPO_BRANCH=$OS_BRANCH" >> $GITHUB_ENV
         echo "DIR_NAME=immortalwrt" >> $GITHUB_ENV
 
+    - name: matrix_target
+      run: |
+        if grep -E "matrix_target=.*?"  OpenWrtSet.txt
+        then
+          target="$(grep -E "matrix_target=.*?"  OpenWrtSet.txt | head -n 1 | sed -e 's/^matrix_target=//')"
+          echo "matrix_target=$target" >> $GITHUB_ENV          
+        else
+          echo "cancel_workflow=true" >> $GITHUB_ENV
+        fi  
 
-    - name: OpenWrt BRANCH 
+    - name: OpenWrt_OS
+      if: cancel_workflow == 'false'
+      run: |
+        if grep -E "OpenWrt_OS=.*?"  OpenWrtSet.txt
+        then
+          OS="$(grep -E "OpenWrt_OS=.*?"  OpenWrtSet.txt | head -n 1 | sed -e 's/^OpenWrt_OS=//')"
+          echo "OpenWrt_OS=$OS" >> $GITHUB_ENV          
+        else
+          echo "cancel_workflow=true" >> $GITHUB_ENV
+        fi  
+        
+
+    - name: OpenWrt BRANCH
+      if: cancel_workflow == 'false'
     # Lienol , Lean , immortalwrt
       run: |
+        if grep -E "OS_BRANCH=.*?"  OpenWrtSet.txt
+        then
+          OS_BRANCH="$(grep -i -E "OS_BRANCH=.*?"  OpenWrtSet.txt |head -n 1| sed -e 's/^OS_BRANCH=//')"
+        else
+          OS_BRANCH=''
+        fi
         if [ ${{env.OpenWrt_OS}} == "Lienol" ] 
         then
-          OS_BRANCH="21.02"
+          if OS_BRANCH == "";then OS_BRANCH="21.02"; fi
           # OS_BRANCH: 21.02(默认), 19.07
           echo "REPO_URL=https://github.com/Lienol/openwrt" >> $GITHUB_ENV
           echo "REPO_BRANCH=$OS_BRANCH" >> $GITHUB_ENV
@@ -107,7 +135,7 @@ jobs:
           echo "DIR_NAME=lede" >> $GITHUB_ENV
         elif [ ${{env.OpenWrt_OS}} == "immortalwrt" ]
         then
-          OS_BRANCH=openwrt-21.02
+          if OS_BRANCH == "";then OS_BRANCH="openwrt-21.02"; fi
           # OS_BRANCH: openwrt-21.02 (默认), openwrt-18.06-k5.4
           echo "REPO_URL=https://github.com/immortalwrt/immortalwrt" >> $GITHUB_ENV
           echo "REPO_BRANCH=$OS_BRANCH" >> $GITHUB_ENV
