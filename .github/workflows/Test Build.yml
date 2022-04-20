@@ -63,7 +63,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        target: [ $needs.job1.outputs.target ]
+        target: [ "${{needs.job1.outputs.target}}" ] 
         # target: nanopi-r2s, nanopi-r4s, x86_64 
 
     steps:
