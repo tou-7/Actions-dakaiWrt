@@ -128,7 +128,7 @@ jobs:
     - name: OpenWrt BRANCH
     # Lienol , Lean , immortalwrt
       run: |
-        OS_BRANCH=${{needs.job1.outputs.branch}}
+        OS_BRANCH="${{needs.job1.outputs.branch}}"
         if [ ${{env.OpenWrt_OS}} == "Lienol" ] 
         then
           [ $OS_BRANCH == "Null" ] && OS_BRANCH="21.02"
