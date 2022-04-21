@@ -190,6 +190,12 @@ jobs:
         echo "你好" > ${{env.DIR_NAME}}/build_dir/target-aarch64_generic_musl/linux-rockchip_armv8/linux-rockchip_armv8/.config
         echo "git clone --depth 1 ${{env.REPO_URL}} -b ${{env.REPO_BRANCH}} ${{env.DIR_NAME}}"
         echo config/${{matrix.target}}\(${{env.OpenWrt_OS}}\).config
+        #
+        mv feedset.sh ${{env.DIR_NAME}}/feedset.sh
+        cd ${{env.DIR_NAME}}
+        echo "你好" > feeds.conf.default
+        chmod +x ./feedset.sh && ./feedset.sh
+        #
         echo 目标 ${{needs.job1.outputs.target}}
         echo 版本 ${{needs.job1.outputs.os}}
         echo 分支 ${{needs.job1.outputs.branch}}
@@ -199,6 +205,7 @@ jobs:
       if: env.test_code == 'true' && env.cancel_workflow == 'false'
       working-directory: ./${{env.DIR_NAME}}
       run: |
+        echo "$(cat feeds.conf.default)"
         echo "$(cat .config)"
         find bin/targets/*/*/{*combined*,*sysupgrade*}
         
