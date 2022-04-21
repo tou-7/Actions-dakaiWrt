@@ -26,24 +26,24 @@ jobs:
       run: |
         if grep -i -E "^\s*matrix_target\s*=.*?"  OpenWrtSet.txt
         then
-          name=$(grep -i -o -E "^\s*matrix_target\s*=" OpenWrtSet.txt | head -n 1 )
-          target="$(grep -i -E "^\s*${name}.*?"  OpenWrtSet.txt | head -n 1 | sed -e 's/$name//')"
+          name="$(grep -i -o -E "^\s*matrix_target\s*=" OpenWrtSet.txt | head -n 1 )"
+          target="$(grep -i -E "^\s*${name}.*?"  OpenWrtSet.txt | head -n 1 | sed -e "s/^${name}//" )"
           echo "::set-output name=target::$target"    
         else
           echo "::set-output name=target::Null"
         fi       
         if grep -i -E "^\s*OpenWrt_OS\s*=.*?"  OpenWrtSet.txt
         then
-          name=$(grep -i -o -E "OpenWrt_OS\s*=" OpenWrtSet.txt | head -n 1 )
-          OS="$(grep -i -E "^\s*${name}.*?"  OpenWrtSet.txt | head -n 1 | sed -e 's/$name//')"
+          name="$(grep -i -o -E "OpenWrt_OS\s*=" OpenWrtSet.txt | head -n 1 )"
+          OS="$(grep -i -E "^\s*${name}.*?"  OpenWrtSet.txt | head -n 1 | sed -e "s/^${name}//" )"
            echo "::set-output name=os::$OS"          
         else
            echo "::set-output name=os::Null" 
         fi      
         if grep -i -E "^\s*OS_BRANCH\s*=.*?"  OpenWrtSet.txt
         then
-          name=$(grep -i -o -E "OS_BRANCH\s*=" OpenWrtSet.txt | head -n 1 )
-          OS_BRANCH="$(grep -i -E "^\s*${name}.*?"  OpenWrtSet.txt |head -n 1| sed -e 's/$name//')"
+          name="$(grep -i -o -E "OS_BRANCH\s*=" OpenWrtSet.txt | head -n 1 )"
+          OS_BRANCH="$(grep -i -E "^\s*${name}.*?"  OpenWrtSet.txt |head -n 1| sed -e "s/^${name}//" )"
           if $OS_BRANCH != ""
           then
             echo "::set-output name=branch::$OS_BRANCH" 
