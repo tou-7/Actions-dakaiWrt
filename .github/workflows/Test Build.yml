@@ -29,7 +29,6 @@ jobs:
     - name: Checkout
       uses: actions/checkout@main
          
-      
     - id: Ver
       run: |
         if grep -i -E "^\s*matrix_target\s*=.*?"  OpenWrtSet.txt
@@ -204,9 +203,9 @@ jobs:
         echo "你好" > feeds.conf.default
         chmod +x ./feedset.sh && ./feedset.sh
         #
-        echo 目标 ${{needs.job1.outputs.target}}
-        echo 版本 ${{needs.job1.outputs.os}}
-        echo 分支 ${{needs.job1.outputs.branch}}
+        echo 目标 ${{needs.GetVer.outputs.target}}
+        echo 版本 ${{needs.GetVer.outputs.os}}
+        echo 分支 ${{needs.GetVer.outputs.branch}}
         #echo ${{ secrets.REPO_TOKEN }}
 
     - name: 伪代码测试 2
