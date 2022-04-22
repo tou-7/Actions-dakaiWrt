@@ -74,6 +74,7 @@ jobs:
 
     runs-on: Ubuntu-20.04
     if: github.event.repository.owner.id == github.event.sender.id
+    needs: GetVer
 
     name: 构建"${{matrix.target}}(${{needs.GetVer.outputs.os}},${{needs.GetVer.outputs.branch}})"固件
     strategy:
