@@ -75,7 +75,7 @@ jobs:
     if: github.event.repository.owner.id == github.event.sender.id
     needs: GetVer
 
-    name: 构建"${{matrix.target}}(${{env.OpenWrt_OS}},${{needs.GetVer.outputs.branch}})"固件
+    name: 构建"${{matrix.target}}(${{needs.GetVer.outputs.os}},${{needs.GetVer.outputs.branch}})"固件
     strategy:
       fail-fast: false
       matrix:
