@@ -13,11 +13,11 @@ jobs:
   GetVer:
     runs-on: ubuntu-latest
     
-    name:  获取 ${{matrix.target}}
+    name: ${{matrix.target}}
     strategy:
       fail-fast: false
       matrix:
-        target: [ "指定 OpenWrt 版本数据" ]  
+        target: [ "获取指定的 OpenWrt 版本数据" ]  
     
     outputs:
       target: ${{ steps.Ver.outputs.target }}
@@ -75,7 +75,7 @@ jobs:
     if: github.event.repository.owner.id == github.event.sender.id
     needs: GetVer
 
-    name: Build ${{matrix.target}}
+    name: 构建"${{matrix.target}}({{env.OpenWrt_OS}},${{needs.GetVer.outputs.branch}})"固件
     strategy:
       fail-fast: false
       matrix:
@@ -140,7 +140,7 @@ jobs:
         echo "DIR_NAME=immortalwrt" >> $GITHUB_ENV
 
 
-    - name: OpenWrt BRANCH
+    - name: 设置"OpenWrt({{env.OpenWrt_OS}})"数据
     # Lienol , Lean , immortalwrt
       run: |
         OS_BRANCH="${{needs.GetVer.outputs.branch}}"
@@ -167,7 +167,7 @@ jobs:
           echo "DIR_NAME=immortalwrt" >> $GITHUB_ENV
         fi  
           
-    - name: 配置检测
+    - name: 测试指定的"${{matrix.target}}"平台配置文件
       #env:
         #CONFIG_FILE: config/${{matrix.target}}\(${{env.OpenWrt_OS}},${{env.REPO_BRANCH}}\).config      
       run: |
@@ -244,7 +244,7 @@ jobs:
         ./scripts/feeds update -a
         ./scripts/feeds install -a
         
-    - name: 自定义配置 ${{matrix.target}}
+    - name: 自定义配置 (${{matrix.target}})
       if: env.test_code == 'false' && env.cancel_workflow == 'false'
       env:
         CONFIG_FILE: config/${{matrix.target}}\(${{env.OpenWrt_OS}},${{env.REPO_BRANCH}}\).config
