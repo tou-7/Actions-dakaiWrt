@@ -55,10 +55,10 @@ jobs:
           then
             echo "::set-output name=branch::$OS_BRANCH" 
           else
-            echo "::set-output name=branch::Null" 
+            echo "::set-output name=branch::Default" 
           fi
         else
-          echo "::set-output name=branch::Null" 
+          echo "::set-output name=branch::Default" 
         fi        
   merge:
     
@@ -140,13 +140,13 @@ jobs:
         echo "DIR_NAME=immortalwrt" >> $GITHUB_ENV
 
 
-    - name: 设置"${{env.OpenWrt_OS}}"数据
+    - name: 固件选择(设为"${{env.OpenWrt_OS}}"代码仓库)
     # Lienol , Lean , immortalwrt
       run: |
         OS_BRANCH="${{needs.GetVer.outputs.branch}}"
         if [ ${{env.OpenWrt_OS}} == "Lienol" ] 
         then
-          [ $OS_BRANCH == "Null" ] && OS_BRANCH="21.02"
+          [ $OS_BRANCH == "Default" ] && OS_BRANCH="21.02"
           # OS_BRANCH: 21.02(默认), 19.07
           echo "REPO_URL=https://github.com/Lienol/openwrt" >> $GITHUB_ENV
           echo "REPO_BRANCH=$OS_BRANCH" >> $GITHUB_ENV
@@ -160,14 +160,14 @@ jobs:
           echo "DIR_NAME=lede" >> $GITHUB_ENV
         elif [ ${{env.OpenWrt_OS}} == "immortalwrt" ]
         then
-          [ $OS_BRANCH == "Null" ] && OS_BRANCH="openwrt-21.02"
+          [ $OS_BRANCH == "Default" ] && OS_BRANCH="openwrt-21.02"
           # OS_BRANCH: openwrt-21.02 (默认), openwrt-18.06-k5.4
           echo "REPO_URL=https://github.com/immortalwrt/immortalwrt" >> $GITHUB_ENV
           echo "REPO_BRANCH=$OS_BRANCH" >> $GITHUB_ENV
           echo "DIR_NAME=immortalwrt" >> $GITHUB_ENV
         fi  
           
-    - name: 测试指定的"${{matrix.target}}"平台配置文件
+    - name: 测试"${{matrix.target}}"平台配置文件
       #env:
         #CONFIG_FILE: config/${{matrix.target}}\(${{env.OpenWrt_OS}},${{env.REPO_BRANCH}}\).config      
       run: |
