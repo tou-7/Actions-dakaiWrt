@@ -8,59 +8,91 @@ on:
         description: 'SSH connection to Actions'
         required: false
         default: 'false'
-
-env:
-  UPLOAD_FIRMWARE: true
-  UPLOAD_RELEASE: true
-  OpenWrt_OS: immortalwrt
-  # OpenWrt_OS: Lienol, Lean, immortalwrt 
-  DelOld_RELEASE: true
-  TZ: Asia/Shanghai
   
 jobs:
-  merge:
-    runs-on: Ubuntu-20.04
-    if: github.event.repository.owner.id == github.event.sender.id
-
-    name: Build ${{matrix.target}}
+  GetVer:
+    runs-on: ubuntu-latest
+    
+    name: ${{matrix.target}}
     strategy:
       fail-fast: false
       matrix:
-        target: [x86_64]
+        target: [ "获取指定的 OpenWrt 版本数据" ]  
+    
+    outputs:
+      target: ${{ steps.Ver.outputs.target }}
+      os: ${{ steps.Ver.outputs.os }}
+      branch: ${{ steps.Ver.outputs.branch }}
+    
+    steps:
+    
+    - name: Checkout
+      uses: actions/checkout@main
+         
+    - id: Ver
+      run: |
+        if grep -i -E "^\s*matrix_target\s*=.*?"  OpenWrtSet.txt
+        then
+          name="$(grep -i -o -E "^\s*matrix_target\s*=" OpenWrtSet.txt | head -n 1 )"
+          target="$(grep -i -E "^\s*${name}.*?"  OpenWrtSet.txt | head -n 1 | sed -e "s/^${name}//" )"
+          echo "::set-output name=target::$target"    
+        else
+          echo "::set-output name=target::Null"
+        fi       
+        if grep -i -E "^\s*OpenWrt_OS\s*=.*?"  OpenWrtSet.txt
+        then
+          name="$(grep -i -o -E "OpenWrt_OS\s*=" OpenWrtSet.txt | head -n 1 )"
+          OS="$(grep -i -E "^\s*${name}.*?"  OpenWrtSet.txt | head -n 1 | sed -e "s/^${name}//" )"
+           echo "::set-output name=os::$OS"          
+        else
+           echo "::set-output name=os::Null" 
+        fi      
+        if grep -i -E "^\s*OS_BRANCH\s*=.*?"  OpenWrtSet.txt
+        then
+          name="$(grep -i -o -E "OS_BRANCH\s*=" OpenWrtSet.txt | head -n 1 )"
+          OS_BRANCH="$(grep -i -E "^\s*${name}.*?"  OpenWrtSet.txt |head -n 1| sed -e "s/^${name}//" )"
+          if $OS_BRANCH != ""
+          then
+            echo "::set-output name=branch::$OS_BRANCH" 
+          else
+            echo "::set-output name=branch::Default" 
+          fi
+        else
+          echo "::set-output name=branch::Default" 
+        fi  
+        
+  merge:
+
+    env:
+      test_code: true
+      UPLOAD_FIRMWARE: true
+      UPLOAD_RELEASE: true
+      OpenWrt_OS: ${{needs.GetVer.outputs.os}}
+      # OpenWrt_OS: Lienol, Lean, immortalwrt 
+      DelOld_RELEASE: true
+      TZ: Asia/Shanghai
+
+    runs-on: Ubuntu-20.04
+    if: github.event.repository.owner.id == github.event.sender.id
+
+    name: 构建"${{matrix.target}}(${{needs.GetVer.outputs.os}},${{needs.GetVer.outputs.branch}})"固件
+    strategy:
+      fail-fast: false
+      matrix:
+        target: [ "${{needs.GetVer.outputs.target}}" ] 
         # target: nanopi-r2s, nanopi-r4s, x86_64 
 
     steps:
     - name: 检查
       uses: actions/checkout@main
 
-    - name: 初始化环境 
-      env:
-        DEBIAN_FRONTEND: noninteractive
-      run: |
-        ( sudo -E apt-get -qq update
-        sudo -E apt-get -qq install build-essential asciidoc binutils bzip2 gawk gettext git libncurses5-dev patch python3 python2.7 unzip zlib1g-dev lib32gcc-s1 libc6-dev-i386 subversion flex uglifyjs gcc-multilib g++-multilib p7zip p7zip-full msmtp libssl-dev texinfo libglib2.0-dev xmlto qemu-utils upx-ucl libelf-dev autoconf automake libtool autopoint device-tree-compiler ccache xsltproc rename antlr3 gperf wget curl swig rsync
-        sudo -E apt-get -qq purge azure-cli ghc* zulu* hhvm llvm* firefox powershell openjdk* dotnet* google* mysql* php* android*
-        sudo rm -rf /etc/apt/sources.list.d/* /usr/share/dotnet /usr/local/lib/android /opt/ghc
-        sudo -E apt-get -qq autoremove --purge
-        sudo -E apt-get -qq clean ) &
-        sudo timedatectl set-timezone "$TZ"
-        
-    - name: 设置当前的日期
-      id: date
-      run: |
-        echo "date=$(date +'%Y.%m.%d-%H%M')" >> $GITHUB_ENV
-        echo "date2=$(date +'%m/%d %Y')" >> $GITHUB_ENV
-        echo "date3=$(date +'%m.%d')" >> $GITHUB_ENV
-        echo "date4=$(date +'%m.%d.%H')" >> $GITHUB_ENV
-        VERSION="$(echo "${{github.event.action}}" | grep -Eo " [0-9.]+" | sed -e 's/ //')" || true
-        [ "$VERSION" ] && echo "VERSION=$VERSION" >> $GITHUB_ENV || echo "VERSION=$(date +'%m.%d')" >> $GITHUB_ENV
-        
-    - name: OpenWrt BRANCH 
+    - name: 固件选择(设为"${{env.OpenWrt_OS}}"代码仓库)
     # Lienol , Lean , immortalwrt
       run: |
+        OS_BRANCH="${{needs.GetVer.outputs.branch}}" 
         if [ ${{env.OpenWrt_OS}} == "Lienol" ] 
         then
-          OS_BRANCH="21.02"
+          [ $OS_BRANCH == "Default" ] && OS_BRANCH="21.02" 
           # OS_BRANCH: 21.02(默认), 19.07
           echo "REPO_URL=https://github.com/Lienol/openwrt" >> $GITHUB_ENV
           echo "REPO_BRANCH=$OS_BRANCH" >> $GITHUB_ENV
@@ -74,14 +106,14 @@ jobs:
           echo "DIR_NAME=lede" >> $GITHUB_ENV
         elif [ ${{env.OpenWrt_OS}} == "immortalwrt" ]
         then
-          OS_BRANCH=openwrt-21.02
+          [ $OS_BRANCH == "Default" ] && OS_BRANCH="openwrt-21.02"
           # OS_BRANCH: openwrt-21.02 (默认), openwrt-18.06-k5.4
           echo "REPO_URL=https://github.com/immortalwrt/immortalwrt" >> $GITHUB_ENV
           echo "REPO_BRANCH=$OS_BRANCH" >> $GITHUB_ENV
           echo "DIR_NAME=immortalwrt" >> $GITHUB_ENV
         fi
         
-    - name: 配置检测    
+    - name: 测试"${{matrix.target}}"平台配置文件  
       run: |
         CONFIG_FILE="config/${{matrix.target}}\(${{env.OpenWrt_OS}},${{env.REPO_BRANCH}}\).config" 
         if [ -e $CONFIG_FILE ] 
@@ -90,7 +122,31 @@ jobs:
         else  
           echo "cancel_workflow=true" >> $GITHUB_ENV
         fi
+
+    - name: 初始化环境 
+      if: env.cancel_workflow == 'false'
+      env:
+        DEBIAN_FRONTEND: noninteractive
+      run: |
+        ( sudo -E apt-get -qq update
+        sudo -E apt-get -qq install build-essential asciidoc binutils bzip2 gawk gettext git libncurses5-dev patch python3 python2.7 unzip zlib1g-dev lib32gcc-s1 libc6-dev-i386 subversion flex uglifyjs gcc-multilib g++-multilib p7zip p7zip-full msmtp libssl-dev texinfo libglib2.0-dev xmlto qemu-utils upx-ucl libelf-dev autoconf automake libtool autopoint device-tree-compiler ccache xsltproc rename antlr3 gperf wget curl swig rsync
+        sudo -E apt-get -qq purge azure-cli ghc* zulu* hhvm llvm* firefox powershell openjdk* dotnet* google* mysql* php* android*
+        sudo rm -rf /etc/apt/sources.list.d/* /usr/share/dotnet /usr/local/lib/android /opt/ghc
+        sudo -E apt-get -qq autoremove --purge
+        sudo -E apt-get -qq clean ) &
+        sudo timedatectl set-timezone "$TZ"
         
+    - name: 设置当前的日期
+      if: env.cancel_workflow == 'false'
+      id: date
+      run: |
+        echo "date=$(date +'%Y.%m.%d-%H%M')" >> $GITHUB_ENV
+        echo "date2=$(date +'%m/%d %Y')" >> $GITHUB_ENV
+        echo "date3=$(date +'%m.%d')" >> $GITHUB_ENV
+        echo "date4=$(date +'%m.%d.%H')" >> $GITHUB_ENV
+        VERSION="$(echo "${{github.event.action}}" | grep -Eo " [0-9.]+" | sed -e 's/ //')" || true
+        [ "$VERSION" ] && echo "VERSION=$VERSION" >> $GITHUB_ENV || echo "VERSION=$(date +'%m.%d')" >> $GITHUB_ENV
+                
     - name: 克隆源代码
       if: env.cancel_workflow == 'false'
       run: |
@@ -99,8 +155,15 @@ jobs:
         if [ -e scripts/feeds ]
         then
           echo "cancel_workflow=false" >> $GITHUB_ENV
-          sed -i '$a src-git kenzo https://github.com/kenzok8/openwrt-packages' feeds.conf.default
-          sed -i '$a src-git small https://github.com/kenzok8/small' feeds.conf.default
+          #sed -i '$a src-git kenzo https://github.com/kenzok8/openwrt-packages' feeds.conf.default
+          #sed -i '$a src-git small https://github.com/kenzok8/small' feeds.conf.default
+          if [ -e ../feedset.sh ]
+          then
+            cp ../feedset.sh feedset.sh
+            chmod +x ./feedset.sh && ./feedset.sh
+            sleep 1
+            rm feedset.sh
+          fi  
         else
           echo "cancel_workflow=true" >> $GITHUB_ENV
         fi
@@ -129,7 +192,7 @@ jobs:
           fi
         fi
          
-    - name: 自定义配置 ${{matrix.target}}
+    - name: 自定义配置 (${{matrix.target}})
       if: env.cancel_workflow == 'false'
       run: |
         CONFIG_FILE="config/${{matrix.target}}\(${{env.OpenWrt_OS}},${{env.REPO_BRANCH}}\).config"
