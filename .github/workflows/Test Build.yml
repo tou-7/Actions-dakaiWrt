@@ -12,6 +12,7 @@ on:
 jobs:
   GetVer:
     runs-on: ubuntu-latest
+    if: github.event.repository.owner.id == github.event.sender.id
     
     name: ${{matrix.target}}
     strategy:
