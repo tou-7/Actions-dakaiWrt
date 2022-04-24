@@ -88,7 +88,7 @@ jobs:
     env:
       OpenWrt_OS: ${{needs.GetVer.outputs.os}}
       git_user: ${{needs.GetVer.outputs.user}}
-      git_repository: ${{needs.GetVer.outputs.repository}}"
+      git_repository: ${{needs.GetVer.outputs.repository}}
 
     if: github.event.repository.owner.id == github.event.sender.id 
     runs-on: Ubuntu-20.04
@@ -100,7 +100,6 @@ jobs:
       fail-fast: false
       matrix:
         target: [ "${{needs.GetVer.outputs.mybranch}}" ] 
-        # target: nanopi-r2s, nanopi-r4s, x86_64 
 
     steps:
     - name: 检查
