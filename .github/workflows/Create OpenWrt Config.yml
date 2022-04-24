@@ -236,7 +236,7 @@ jobs:
       env: 
         ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
       run: |        
-        for file in $(ls *.config | sed -e 's/.config//')
+        for file in $(ls ${{env.DIR_NAME}}/*.config | sed -e 's/.config//')
         do 
           cp -f ${{env.DIR_NAME}}/$file.config ${{env.git_repository}}/config/$file\(${{env.OpenWrt_OS}},${{env.REPO_BRANCH}}\).config 
         done
