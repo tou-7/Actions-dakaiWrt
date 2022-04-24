@@ -1,3 +1,0 @@
-matrix_target=x86_64
-OpenWrt_OS=immortalwrt
-OS_BRANCH=
