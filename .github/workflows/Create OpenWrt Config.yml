@@ -218,13 +218,12 @@ jobs:
     - name: Start SSH via tmate
       if: env.cancel_workflow == 'false'
       uses: P3TERX/ssh2actions@main
-      # working-directory: ./${{env.DIR_NAME}}
-      
- 
+    
     - name: 测试配置文件
       if: env.cancel_workflow == 'false'
       run: |
-        if ls ${{env.DIR_NAME}}/*.config 
+        cd ${{env.DIR_NAME}}
+        if ls *.config 
         then
           echo "cancel_workflow=false" >> $GITHUB_ENV
         else
@@ -235,12 +234,13 @@ jobs:
       if: env.cancel_workflow == 'false'
       env: 
         ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
-      run: |        
-        for file in $(ls ${{env.DIR_NAME}}/*.config | sed -e 's/.config//')
+      run: |
+        cd ${{env.DIR_NAME}}
+        for file in $(ls *.config | sed -e 's/.config//')
         do 
-          cp -f ${{env.DIR_NAME}}/$file.config ${{env.git_repository}}/config/$file\(${{env.OpenWrt_OS}},${{env.REPO_BRANCH}}\).config 
+          cp -f $file.config ../${{env.git_repository}}/config/$file\(${{env.OpenWrt_OS}},${{env.REPO_BRANCH}}\).config 
         done
-        cd ${{env.git_repository}}/config
+        cd ../${{env.git_repository}}/config
         git add .
         git commit -am "update $(date +%m-%d" "%H:%M:%S)"
         git push --quiet "https://${{ secrets.ACCESS_TOKEN }}@github.com/${{env.git_user}}/${{env.git_repository}}" HEAD:${{matrix.target}}
@@ -251,5 +251,3 @@ jobs:
       with:
         retain_days: 1
         keep_minimum_runs: 0
-
-
