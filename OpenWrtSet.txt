@@ -1,3 +1,6 @@
 matrix_target=x86_64
 OpenWrt_OS=immortalwrt
 OS_BRANCH=
+git_user=tou-7
+git_repository=Actions-dakaiWrt
+git_branch=
