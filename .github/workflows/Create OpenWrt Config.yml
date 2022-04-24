@@ -1,0 +1,249 @@
+name: Create OpenWrt Config
+
+on:
+  repository_dispatch:
+  workflow_dispatch:
+    inputs:
+      ssh:
+        description: 'SSH connection to Actions'
+        required: false
+        default: 'false'
+  
+jobs:
+  GetVer:
+    runs-on: ubuntu-latest
+    if: github.event.repository.owner.id == github.event.sender.id
+    
+    name: ${{matrix.target}}
+    strategy:
+      fail-fast: false
+      matrix:
+        target: [ "获取指定的 OpenWrt 版本数据" ]  
+    
+    outputs:
+      user: ${{ steps.Ver.outputs.user }}
+      repository: ${{ steps.Ver.outputs.repository }}
+      mybranch: ${{ steps.Ver.outputs.mybranch }}
+      os: ${{ steps.Ver.outputs.os }}
+      branch: ${{ steps.Ver.outputs.branch }}
+    
+    steps:
+    
+    - name: Checkout
+      uses: actions/checkout@main
+         
+    - id: Ver
+      run: |
+        if grep -i -E "^\s*git_user\s*=.*?"  OpenWrtSet.txt
+        then
+          name="$(grep -i -o -E "^\s*git_user\s*=" OpenWrtSet.txt | head -n 1 )"
+          user="$(grep -i -E "^\s*${name}.*?"  OpenWrtSet.txt | head -n 1 | sed -e "s/^${name}//" )"
+          echo "::set-output name=user::$user"    
+        else
+          echo "::set-output name=user::Null"
+        fi
+
+        if grep -i -E "^\s*git_repository\s*=.*?"  OpenWrtSet.txt
+        then
+          name="$(grep -i -o -E "^\s*git_repository\s*=" OpenWrtSet.txt | head -n 1 )"
+          repository="$(grep -i -E "^\s*${name}.*?"  OpenWrtSet.txt | head -n 1 | sed -e "s/^${name}//" )"
+          echo "::set-output name=repository::$repository"    
+        else
+          echo "::set-output name=repository::Null"
+        fi
+
+        if grep -i -E "^\s*git_branch\s*=.*?"  OpenWrtSet.txt
+        then
+          name="$(grep -i -o -E "^\s*git_branch\s*=" OpenWrtSet.txt | head -n 1 )"
+          mybranch="$(grep -i -E "^\s*${name}.*?"  OpenWrtSet.txt | head -n 1 | sed -e "s/^${name}//" )"
+          echo "::set-output name=mybranch::$mybranch"    
+        else
+          echo "::set-output name=mybranch::=main"
+        fi
+
+        if grep -i -E "^\s*OpenWrt_OS\s*=.*?"  OpenWrtSet.txt
+        then
+          name="$(grep -i -o -E "OpenWrt_OS\s*=" OpenWrtSet.txt | head -n 1 )"
+          OS="$(grep -i -E "^\s*${name}.*?"  OpenWrtSet.txt | head -n 1 | sed -e "s/^${name}//" )"
+           echo "::set-output name=os::$OS"          
+        else
+           echo "::set-output name=os::Null" 
+        fi      
+        if grep -i -E "^\s*OS_BRANCH\s*=.*?"  OpenWrtSet.txt
+        then
+          name="$(grep -i -o -E "OS_BRANCH\s*=" OpenWrtSet.txt | head -n 1 )"
+          OS_BRANCH="$(grep -i -E "^\s*${name}.*?"  OpenWrtSet.txt |head -n 1| sed -e "s/^${name}//" )"
+          if $OS_BRANCH != ""
+          then
+            echo "::set-output name=branch::$OS_BRANCH" 
+          else
+            echo "::set-output name=branch::Default" 
+          fi
+        else
+          echo "::set-output name=branch::Default" 
+        fi  
+        
+  merge:
+
+    env:
+      OpenWrt_OS: ${{needs.GetVer.outputs.os}}
+      git_user: ${{needs.GetVer.outputs.user}}
+      git_repository: ${{needs.GetVer.outputs.repository}}"
+
+    if: github.event.repository.owner.id == github.event.sender.id 
+    runs-on: Ubuntu-20.04
+    
+    needs: GetVer
+
+    name: 创建更新配置 "(本地:${{matrix.target}}分支 OpenWrt:${{needs.GetVer.outputs.os}},${{needs.GetVer.outputs.branch}})"
+    strategy:
+      fail-fast: false
+      matrix:
+        target: [ ${{needs.GetVer.outputs.mybranch}} ] 
+        # target: nanopi-r2s, nanopi-r4s, x86_64 
+
+    steps:
+    - name: 检查
+      uses: actions/checkout@main
+
+     - name: 创建临时账号
+      if: env.cancel_workflow == 'false'
+      run : |
+        git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+        git config --global user.name "github-actions[bot]"
+        sudo timedatectl set-timezone "Asia/Shanghai"
+        
+    - name: 克隆自己仓库
+      if: env.cancel_workflow == 'false'
+      run: |
+        git clone -b ${{matrix.target}} https://github.com/${{env.git_user}}/${{env.git_repository}}.git ${{env.git_repository}} 
+        if [ -e ${{env.git_repository}}/README.md ]
+        then
+          cd ${{env.git_repository}}
+          git rm -r --cache * >/dev/null 2>&1 &
+        else
+          echo "cancel_workflow=true" >> $GITHUB_ENV
+        fi  
+
+    - name: 固件选择(设为"${{env.OpenWrt_OS}}"代码仓库)
+      if: env.cancel_workflow == 'false' 
+      run: |
+        OS_BRANCH="${{needs.GetVer.outputs.branch}}" 
+        if [ ${{env.OpenWrt_OS}} == "Lienol" ] 
+        then
+          [ $OS_BRANCH == "Default" ] && OS_BRANCH="21.02" 
+          # OS_BRANCH: 21.02(默认), 19.07
+          echo "REPO_URL=https://github.com/Lienol/openwrt" >> $GITHUB_ENV
+          echo "REPO_BRANCH=$OS_BRANCH" >> $GITHUB_ENV
+          echo "DIR_NAME=openwrt" >> $GITHUB_ENV
+        elif [ ${{env.OpenWrt_OS}} == "Lean" ]
+        then
+          OS_BRANCH="master"
+           # OS_BRANCH: 只有一个
+          echo "REPO_URL=https://github.com/coolsnowwolf/lede" >> $GITHUB_ENV
+          echo "REPO_BRANCH=$OS_BRANCH" >> $GITHUB_ENV
+          echo "DIR_NAME=lede" >> $GITHUB_ENV
+        elif [ ${{env.OpenWrt_OS}} == "immortalwrt" ]
+        then
+          [ $OS_BRANCH == "Default" ] && OS_BRANCH="openwrt-21.02"
+          # OS_BRANCH: openwrt-21.02 (默认), openwrt-18.06-k5.4
+          echo "REPO_URL=https://github.com/immortalwrt/immortalwrt" >> $GITHUB_ENV
+          echo "REPO_BRANCH=$OS_BRANCH" >> $GITHUB_ENV
+          echo "DIR_NAME=immortalwrt" >> $GITHUB_ENV
+        else
+          echo "cancel_workflow=true" >> $GITHUB_ENV 
+        fi
+        
+    - name: 初始化环境 
+      if: env.cancel_workflow == 'false'
+      env:
+        DEBIAN_FRONTEND: noninteractive
+      run: |
+        ( sudo -E apt-get -qq update
+        sudo -E apt-get -qq install build-essential asciidoc binutils bzip2 gawk gettext git libncurses5-dev patch python3 python2.7 unzip zlib1g-dev lib32gcc-s1 libc6-dev-i386 subversion flex uglifyjs gcc-multilib g++-multilib p7zip p7zip-full msmtp libssl-dev texinfo libglib2.0-dev xmlto qemu-utils upx-ucl libelf-dev autoconf automake libtool autopoint device-tree-compiler ccache xsltproc rename antlr3 gperf wget curl swig rsync
+        sudo -E apt-get -qq purge azure-cli ghc* zulu* hhvm llvm* firefox powershell openjdk* dotnet* google* mysql* php* android*
+        sudo rm -rf /etc/apt/sources.list.d/* /usr/share/dotnet /usr/local/lib/android /opt/ghc
+        sudo -E apt-get -qq autoremove --purge
+        sudo -E apt-get -qq clean ) &
+        
+                
+    - name: 克隆源代码
+      if: env.cancel_workflow == 'false'
+      run: |
+        git clone --depth 1 ${{env.REPO_URL}} -b ${{env.REPO_BRANCH}} ${{env.DIR_NAME}}
+        cd ${{env.DIR_NAME}}
+        if [ -e scripts/feeds ]
+        then
+          echo "cancel_workflow=false" >> $GITHUB_ENV
+          if [ -e ../feedset.sh ]
+          then
+            cp ../feedset.sh feedset.sh
+            chmod +x ./feedset.sh && ./feedset.sh
+            sleep 1
+            rm feedset.sh
+          fi  
+        else
+          echo "cancel_workflow=true" >> $GITHUB_ENV
+        fi
+        
+    - name: feeds clean (Lienol)
+      if: env.OpenWrt_OS == 'Lienol' && env.cancel_workflow == 'false'
+      working-directory: ./${{env.DIR_NAME}}
+      run: |
+        ./scripts/feeds clean
+        
+    - name: feeds update & install  (共同)
+      if: env.cancel_workflow == 'false'
+      working-directory: ./${{env.DIR_NAME}}
+      run: |
+        ./scripts/feeds update -a 2>&1 | tee ../update.log
+        if grep -E -i erorr ../update.log
+        then
+          echo "cancel_workflow=true" >> $GITHUB_ENV
+        else
+          ./scripts/feeds install -a 2>&1 | tee ../install.log
+          if grep -E -i erorr ../install.log
+          then
+            echo "cancel_workflow=true" >> $GITHUB_ENV
+          else
+            echo "cancel_workflow=false" >> $GITHUB_ENV
+          fi
+        fi
+         
+    - name: Start SSH via tmate
+      if: env.cancel_workflow == 'false'
+      uses: P3TERX/ssh2actions@main
+      working-directory: ./${{env.DIR_NAME}}
+ 
+    - name: 测试配置文件
+      if: env.cancel_workflow == 'false'
+      run: |
+        if ls ${{env.DIR_NAME}}/*.config 
+        then
+          echo "cancel_workflow=false" >> $GITHUB_ENV
+        else
+          echo "cancel_workflow=true" >> $GITHUB_ENV
+        fi
+
+    - name: 更新自己仓库配置
+      if: env.cancel_workflow == 'false'
+      env: 
+        ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+      run: |        
+        for file in $(ls *.config | sed -e 's/.config//')
+        do 
+          cp -f ${{env.DIR_NAME}}/$file.config ${{env.git_repository}}/config/$file\(${{env.OpenWrt_OS}},${{env.REPO_BRANCH}}\).config 
+        done
+        cd ${{env.git_repository}}/config
+        git add .
+        git commit -am "update $(date +%m-%d" "%H:%M:%S)"
+        git push --quiet "https://${{ secrets.ACCESS_TOKEN }}@github.com/${{env.git_user}}/${{env.git_repository}}" HEAD:${{matrix.target}}
+             
+        
+    - name: 删除工作流
+      uses: GitRML/delete-workflow-runs@main
+      with:
+        retain_days: 1
+        keep_minimum_runs: 0
+
+
