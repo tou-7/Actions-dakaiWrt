@@ -99,7 +99,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        target: [ ${{needs.GetVer.outputs.mybranch}} ] 
+        target: [ "${{needs.GetVer.outputs.mybranch}}" ] 
         # target: nanopi-r2s, nanopi-r4s, x86_64 
 
     steps:
