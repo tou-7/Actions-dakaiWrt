@@ -122,6 +122,7 @@ jobs:
         git clone -b ${{matrix.target}} https://github.com/${{env.git_user}}/${{env.git_repository}}.git ${{env.git_repository}} 
         if [ -e ${{env.git_repository}}/README.md ]
         then
+          echo "cancel_workflow=false" >> $GITHUB_ENV
           cd ${{env.git_repository}}
           git rm -r --cache * >/dev/null 2>&1 &
         else
