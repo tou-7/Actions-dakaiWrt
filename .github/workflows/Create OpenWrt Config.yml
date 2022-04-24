@@ -240,7 +240,7 @@ jobs:
         do 
           cp -f $file.config ../${{env.git_repository}}/config/$file\(${{env.OpenWrt_OS}},${{env.REPO_BRANCH}}\).config 
         done
-        cd ../${{env.git_repository}}/config
+        cd ../${{env.git_repository}}
         git add .
         git commit -am "update $(date +%m-%d" "%H:%M:%S)"
         git push --quiet "https://${{ secrets.ACCESS_TOKEN }}@github.com/${{env.git_user}}/${{env.git_repository}}" HEAD:${{matrix.target}}
