@@ -56,9 +56,14 @@ jobs:
         then
           name="$(grep -i -o -E "^\s*git_branch\s*=" OpenWrtSet.txt | head -n 1 )"
           mybranch="$(grep -i -E "^\s*${name}.*?"  OpenWrtSet.txt | head -n 1 | sed -e "s/^${name}//" )"
-          echo "::set-output name=mybranch::$mybranch"    
+          if $mybranch != ""
+          then
+            echo "::set-output name=mybranch::$mybranch"  
+          else
+            echo "::set-output name=mybranch::main" 
+          fi          
         else
-          echo "::set-output name=mybranch::=main"
+          echo "::set-output name=mybranch::main"
         fi
 
         if grep -i -E "^\s*OpenWrt_OS\s*=.*?"  OpenWrtSet.txt
