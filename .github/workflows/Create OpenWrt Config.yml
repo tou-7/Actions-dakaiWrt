@@ -95,7 +95,7 @@ jobs:
     
     needs: GetVer
 
-    name: 创建更新配置 "(本地:${{matrix.target}}分支 OpenWrt:${{needs.GetVer.outputs.os}},${{needs.GetVer.outputs.branch}})"
+    name: 创建更新配置 "(本地:${{matrix.target}}分支 OpenWrt:${{needs.GetVer.outputs.os}},${{needs.GetVer.outputs.branch}}版)"
     strategy:
       fail-fast: false
       matrix:
