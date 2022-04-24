@@ -89,6 +89,7 @@ jobs:
       OpenWrt_OS: ${{needs.GetVer.outputs.os}}
       git_user: ${{needs.GetVer.outputs.user}}
       git_repository: ${{needs.GetVer.outputs.repository}}
+      TZ: Asia/Shanghai
 
     if: github.event.repository.owner.id == github.event.sender.id 
     runs-on: Ubuntu-20.04
@@ -110,7 +111,7 @@ jobs:
       run: |
         git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
         git config --global user.name "github-actions[bot]"
-        sudo timedatectl set-timezone "Asia/Shanghai"
+        # sudo timedatectl set-timezone "Asia/Shanghai"
         
     - name: 克隆自己仓库
       if: env.cancel_workflow == 'false'
@@ -164,6 +165,7 @@ jobs:
         sudo rm -rf /etc/apt/sources.list.d/* /usr/share/dotnet /usr/local/lib/android /opt/ghc
         sudo -E apt-get -qq autoremove --purge
         sudo -E apt-get -qq clean ) &
+        sudo timedatectl set-timezone "$TZ"
         
                 
     - name: 克隆源代码
@@ -212,7 +214,8 @@ jobs:
     - name: Start SSH via tmate
       if: env.cancel_workflow == 'false'
       uses: P3TERX/ssh2actions@main
-      working-directory: ./${{env.DIR_NAME}}
+      # working-directory: ./${{env.DIR_NAME}}
+      
  
     - name: 测试配置文件
       if: env.cancel_workflow == 'false'
