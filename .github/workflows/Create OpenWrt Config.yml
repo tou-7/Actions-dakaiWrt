@@ -235,12 +235,11 @@ jobs:
       env: 
         ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
       run: |
-        cd ${{env.DIR_NAME}}
-        for file in $(ls *.config | sed -e 's/.config//')
+        for file in $(ls ${{env.DIR_NAME}}/*.config | sed -r "s/^${{env.DIR_NAME}}(.*?)\.config$/\1/")
         do 
-          cp -f $file.config ../${{env.git_repository}}/config/$file\(${{env.OpenWrt_OS}},${{env.REPO_BRANCH}}\).config 
+          cp -f ${{env.DIR_NAME}}/$file.config ${{env.git_repository}}/config/$file\(${{env.OpenWrt_OS}},${{env.REPO_BRANCH}}\).config 
         done
-        cd ../${{env.git_repository}}
+        cd ${{env.git_repository}}
         git add .
         git commit -am "update $(date +%m-%d" "%H:%M:%S)"
         git push --quiet "https://${{ secrets.ACCESS_TOKEN }}@github.com/${{env.git_user}}/${{env.git_repository}}" HEAD:${{matrix.target}}
