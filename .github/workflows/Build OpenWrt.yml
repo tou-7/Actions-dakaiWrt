@@ -11,9 +11,10 @@ on:
   
 jobs:
   GetVer:
-    runs-on: ubuntu-latest
     if: github.event.repository.owner.id == github.event.sender.id
     
+    runs-on: ubuntu-latest
+  
     name: ${{matrix.target}}
     strategy:
       fail-fast: false
@@ -72,9 +73,11 @@ jobs:
       # OpenWrt_OS: Lienol, Lean, immortalwrt 
       DelOld_RELEASE: true
       TZ: Asia/Shanghai
-
-    runs-on: Ubuntu-20.04
+      
     if: github.event.repository.owner.id == github.event.sender.id
+    
+    runs-on: Ubuntu-20.04
+    
     needs: GetVer
 
     name: 构建"${{matrix.target}}(${{needs.GetVer.outputs.os}},${{needs.GetVer.outputs.branch}})"固件
