@@ -22,6 +22,7 @@ jobs:
     
     outputs:
       user: ${{ steps.Ver.outputs.user }}
+      email: ${{ steps.Ver.outputs.email }}
       repository: ${{ steps.Ver.outputs.repository }}
       mybranch: ${{ steps.Ver.outputs.mybranch }}
       os: ${{ steps.Ver.outputs.os }}
@@ -43,6 +44,15 @@ jobs:
           echo "::set-output name=user::Null"
         fi
 
+        if grep -i -E "^\s*git_email\s*=.*?"  OpenWrtSet.txt
+        then
+          name="$(grep -i -o -E "^\s*git_email\s*=" OpenWrtSet.txt | head -n 1 )"
+          email="$(grep -i -E "^\s*${name}.*?"  OpenWrtSet.txt | head -n 1 | sed -e "s/^${name}//" )"
+          echo "::set-output name=email::$email"    
+        else
+          echo "::set-output name=email::Null"
+        fi
+        
         if grep -i -E "^\s*git_repository\s*=.*?"  OpenWrtSet.txt
         then
           name="$(grep -i -o -E "^\s*git_repository\s*=" OpenWrtSet.txt | head -n 1 )"
@@ -94,6 +104,7 @@ jobs:
       OpenWrt_OS: ${{needs.GetVer.outputs.os}}
       git_user: ${{needs.GetVer.outputs.user}}
       git_repository: ${{needs.GetVer.outputs.repository}}
+      git_email: ${{needs.GetVer.outputs.email}}
       TZ: Asia/Shanghai
 
     if: github.event.repository.owner.id == github.event.sender.id 
@@ -111,10 +122,15 @@ jobs:
     - name: 检查
       uses: actions/checkout@main
 
-    - name: 创建临时账号
+    - name: 设置git用户
       run: |
-        git config --global user.email "32321224+tou-7@users.noreply.github.com"
-        git config --global user.name "tou-7"
+        if ! [ ${{env.git_email}} == "Null" ] && ! [ ${{env.git_user}} == "Null"]
+          git config --global user.email ${{env.git_email}}
+          git config --global user.name ${{env.git_user}}
+        else
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+        fi
         # sudo timedatectl set-timezone "Asia/Shanghai"
         
     - name: 克隆自己仓库
@@ -222,8 +238,8 @@ jobs:
     - name: 测试配置文件
       if: env.cancel_workflow == 'false'
       run: |
-        cd ${{env.DIR_NAME}}
-        if ls *.config 
+        # cd ${{env.DIR_NAME}}
+        if ls ${{env.DIR_NAME}}/*.config 
         then
           echo "cancel_workflow=false" >> $GITHUB_ENV
         else
@@ -235,6 +251,7 @@ jobs:
       env: 
         ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
       run: |
+        git -C ${{env.git_repository}} pull
         for file in $(ls ${{env.DIR_NAME}}/*.config | sed -r "s/^${{env.DIR_NAME}}(.*?)\.config$/\1/")
         do 
           cp -f ${{env.DIR_NAME}}/$file.config ${{env.git_repository}}/config/$file\(${{env.OpenWrt_OS}},${{env.REPO_BRANCH}}\).config 
