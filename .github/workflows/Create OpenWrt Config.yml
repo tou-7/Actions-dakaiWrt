@@ -104,12 +104,12 @@ jobs:
           sh="$(grep -i -E "^\s*${name}.*?"  OpenWrtSet.txt |head -n 1| sed -e "s/^${name}//" )"
           if $sh != ""
           then
-            echo "::set-output name=branch::$sh.sh" 
+           (echo $sh | grep -i -E ".sh$") && echo "::set-output name=sh::$sh" || echo "::set-output name=sh::${sh}.sh"
           else
-            echo "::set-output name=branch::cowc.sh" 
+            echo "::set-output name=sh::cowc.sh" 
           fi
         else
-          echo "::set-output name=branch::conwc.sh" 
+          echo "::set-output name=sh::conwc.sh" 
         fi 
         
   merge:
@@ -119,6 +119,7 @@ jobs:
       git_user: ${{needs.GetVer.outputs.user}}
       git_repository: ${{needs.GetVer.outputs.repository}}
       git_email: ${{needs.GetVer.outputs.email}}
+      sh_file: ${{needs.GetVer.outputs.sh}}
       TZ: Asia/Shanghai
 
     if: github.event.repository.owner.id == github.event.sender.id 
@@ -243,9 +244,9 @@ jobs:
             echo "cancel_workflow=true" >> $GITHUB_ENV
           else
             echo "cancel_workflow=false" >> $GITHUB_ENV
-            echo cd ${{env.DIR_NAME}} > ../cowc.sh
-            echo make menuconfig >> ../cowc.sh
-            chmod +x ../cowc.sh
+            echo cd ${{env.DIR_NAME}} > ../${{env.sh_file}}
+            echo make menuconfig >> ../${{env.sh_file}}
+            chmod +x ../${{env.sh_file}}
           fi
         fi
          
