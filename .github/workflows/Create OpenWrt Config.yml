@@ -229,9 +229,9 @@ jobs:
             echo "cancel_workflow=true" >> $GITHUB_ENV
           else
             echo "cancel_workflow=false" >> $GITHUB_ENV
-            echo cd ${{env.DIR_NAME}} > cowc.sh
-            echo make menuconfig >> cowc.sh
-            chmod +x cowc.sh
+            echo cd ${{env.DIR_NAME}} > ../cowc.sh
+            echo make menuconfig >> ../cowc.sh
+            chmod +x ../cowc.sh
           fi
         fi
          
