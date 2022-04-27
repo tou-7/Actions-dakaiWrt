@@ -27,6 +27,7 @@ jobs:
       mybranch: ${{ steps.Ver.outputs.mybranch }}
       os: ${{ steps.Ver.outputs.os }}
       branch: ${{ steps.Ver.outputs.branch }}
+      sh: ${{ steps.Ver.outputs.sh }}
     
     steps:
     
@@ -97,6 +98,19 @@ jobs:
         else
           echo "::set-output name=branch::Default" 
         fi  
+        if grep -i -E "^\s*cowcfile_sh\s*=.*?"  OpenWrtSet.txt
+        then
+          name="$(grep -i -o -E "cowcfile_sh\s*=" OpenWrtSet.txt | head -n 1 )"
+          sh="$(grep -i -E "^\s*${name}.*?"  OpenWrtSet.txt |head -n 1| sed -e "s/^${name}//" )"
+          if $sh != ""
+          then
+            echo "::set-output name=branch::$sh.sh" 
+          else
+            echo "::set-output name=branch::cowc.sh" 
+          fi
+        else
+          echo "::set-output name=branch::conwc.sh" 
+        fi 
         
   merge:
 
