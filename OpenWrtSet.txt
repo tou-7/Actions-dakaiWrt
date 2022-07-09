@@ -1,5 +1,5 @@
-matrix_target=x86_64
-OpenWrt_OS=Lean
+matrix_target=r2s
+OpenWrt_OS=immortalwrt
 OS_BRANCH=
 git_user=tou-7
 git_email=32321224+tou-7@users.noreply.github.com
