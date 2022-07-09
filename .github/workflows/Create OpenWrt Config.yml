@@ -67,7 +67,7 @@ jobs:
         then
           name="$(grep -i -o -E "^\s*git_branch\s*=" OpenWrtSet.txt | head -n 1 )"
           mybranch="$(grep -i -E "^\s*${name}.*?"  OpenWrtSet.txt | head -n 1 | sed -e "s/^${name}//" )"
-          if $mybranch != ""
+          if [ $mybranch != "" ]
           then
             echo "::set-output name=mybranch::$mybranch"  
           else
@@ -89,7 +89,7 @@ jobs:
         then
           name="$(grep -i -o -E "OS_BRANCH\s*=" OpenWrtSet.txt | head -n 1 )"
           OS_BRANCH="$(grep -i -E "^\s*${name}.*?"  OpenWrtSet.txt |head -n 1| sed -e "s/^${name}//" )"
-          if $OS_BRANCH != ""
+          if [ $OS_BRANCH != "" ]
           then
             echo "::set-output name=branch::$OS_BRANCH" 
           else
@@ -102,7 +102,7 @@ jobs:
         then
           name="$(grep -i -o -E "cowcfile_sh\s*=" OpenWrtSet.txt | head -n 1 )"
           sh="$(grep -i -E "^\s*${name}.*?"  OpenWrtSet.txt |head -n 1| sed -e "s/^${name}//" )"
-          if $sh != ""
+          if [ $sh != "" ]
           then
            (echo $sh | grep -i -E "\.sh$") && echo "::set-output name=sh::$sh" || echo "::set-output name=sh::${sh}.sh"
           else
