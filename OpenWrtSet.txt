@@ -1,6 +1,8 @@
+//openwrt 仓库克隆设置
 matrix_target=r2s
 OpenWrt_OS=immortalwrt
 OS_BRANCH=openwrt-18.06-k5.4
+//克隆自己仓库设置
 git_user=tou-7
 git_email=32321224+tou-7@users.noreply.github.com
 git_repository=Actions-dakaiWrt
