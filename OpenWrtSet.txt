@@ -1,8 +1,8 @@
 matrix_target=r2s
 OpenWrt_OS=immortalwrt
-OS_BRANCH=
+OS_BRANCH=openwrt-18.06-k5.4
 git_user=tou-7
 git_email=32321224+tou-7@users.noreply.github.com
 git_repository=Actions-dakaiWrt
-git_branch=
+git_branch=openwrt-18.06-k5.4
 cowcfile_sh=bb
