@@ -53,7 +53,7 @@ jobs:
         then
           name="$(grep -i -o -E "OS_BRANCH\s*=" OpenWrtSet.txt | head -n 1 )"
           OS_BRANCH="$(grep -i -E "^\s*${name}.*?"  OpenWrtSet.txt |head -n 1| sed -e "s/^${name}//" )"
-          if $OS_BRANCH != ""
+          if [ $OS_BRANCH != "" ]
           then
             echo "::set-output name=branch::$OS_BRANCH" 
           else
