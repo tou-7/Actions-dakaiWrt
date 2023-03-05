@@ -1,6 +1,6 @@
 //openwrt 仓库克隆设置
-matrix_target=r4s
-OpenWrt_OS=Lean
+matrix_target=r2s
+OpenWrt_OS=Lienol
 OS_BRANCH=
 //克隆自己仓库设置
 git_user=tou-7
