@@ -120,7 +120,7 @@ jobs:
         
     - name: 测试"${{matrix.target}}"平台配置文件  
       run: |
-        CONFIG_FILE="config/${{matrix.target}}\(${{env.OpenWrt_OS}},${{env.REPO_BRANCH}}\).config" 
+        CONFIG_FILE=config/${{matrix.target}}\(${{env.OpenWrt_OS}},${{env.REPO_BRANCH}}\).config 
         if [ -e $CONFIG_FILE ] 
         then
           echo "cancel_workflow=false" >> $GITHUB_ENV 
@@ -201,7 +201,7 @@ jobs:
     - name: 自定义配置 (${{matrix.target}})
       if: env.cancel_workflow == 'false'
       run: |
-        CONFIG_FILE="config/${{matrix.target}}\(${{env.OpenWrt_OS}},${{env.REPO_BRANCH}}\).config"
+        CONFIG_FILE=config/${{matrix.target}}\(${{env.OpenWrt_OS}},${{env.REPO_BRANCH}}\).config
         # nanopi-r2s(Lienol,BRANCH).config, nanopi-r2s(Lean,BRANCH).config, nanopi-r2s(immortalwrt,BRANCH).config
         # nanopi-r4s(Lienol,BRANCH).config, nanopi-r4s(Lean,BRANCH).config, nanopi-r4s(immortalwrt,BRANCH).config
         # x86_64(Lienol,BRANCH).config, x86_64(Lean,BRANCH).config, x86_64(immortalwrt,BRANCH).config
@@ -217,10 +217,11 @@ jobs:
         find dl -size -1024c -exec rm -f {} \;
  
     - name: 设置缓存
+      if: env.cancel_workflow == 'false'
       uses: klever1988/cachewrtbuild@main
       with:
         ccache: 'true'
-        prefix: ${{ github.workspace }}/${{env.DIR_NAME}}
+        prefix: ${{env.DIR_NAME}}
         
         
     - name: 编译固件
