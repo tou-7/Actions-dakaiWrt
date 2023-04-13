@@ -1,5 +1,5 @@
 //openwrt 仓库克隆设置
-matrix_target=r4s
+matrix_target=r2s
 OpenWrt_OS=Lean
 OS_BRANCH=
 //克隆自己仓库设置
