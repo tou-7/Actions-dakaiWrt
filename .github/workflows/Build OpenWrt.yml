@@ -220,7 +220,7 @@ jobs:
       uses: klever1988/cachewrtbuild@main
       with:
         ccache: 'true'
-        prefix: ${{env.DIR_NAME}}
+        prefix: ${{ github.workspace }}/${{env.DIR_NAME}}
         
         
     - name: 编译固件
