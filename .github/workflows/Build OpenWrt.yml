@@ -239,7 +239,7 @@ jobs:
       id: organize
       if: env.UPLOAD_FIRMWARE == 'true' && !cancelled() && env.cancel_workflow == 'false'
       run: |
-         if find bin/targets/*/*/*combined* || find bin/targets/*/*/*sysupgrade*
+         if find ${{env.DIR_NAME}}/bin/targets/*/*/{*combined*,*sysupgrade*}
          then
            echo "::set-output name=status::success"
            echo "cancel_workflow=false" >> $GITHUB_ENV
