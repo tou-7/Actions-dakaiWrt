@@ -1,0 +1,29 @@
+{
+    "Liunx": "Ubuntu-22.04",
+    "select": {
+        "Lienol": {
+            "url": "https://github.com/Lienol/openwrt",
+            "branch": "21.02"
+        },
+        "Lean": {
+            "url": "https://github.com/coolsnowwolf/lede",
+            "branch": "master"
+        },
+        "immortalwrt": {
+            "url": "https://github.com/immortalwrt/immortalwrt",
+            "branch": "openwrt-21.02"
+        }
+    },
+    "build": {
+        "target": "r2s",
+        "version": "Lean",
+        "branch": ""
+    },
+    "config": {
+        "user": "tou-7",
+        "email": "32321224+tou-7@users.noreply.github.com",
+        "repository": "Actions-dakaiWrt",
+        "branch": "",
+        "shFile": "bb"
+    }
+}
