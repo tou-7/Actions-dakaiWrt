@@ -1,17 +1,21 @@
 {
     "Liunx": "Ubuntu-22.04",
     "select": {
+        "credits":"感谢 kenzok8大哥 整理的插件",
         "Lienol": {
+            "credits":"感谢 Lienol大佬 代码支持",
             "url": "https://github.com/Lienol/openwrt",
             "branch": "21.02",
             "dir": "openwrt"
         },
         "Lean": {
+            "credits":"感谢 Lean大佬 代码支持",
             "url": "https://github.com/coolsnowwolf/lede",
             "branch": "master",
             "dir": "leam"
         },
         "immortalwrt": {
+            "credits":"感谢 天灵大佬 代码支持",
             "url": "https://github.com/immortalwrt/immortalwrt",
             "branch": "openwrt-21.02",
             "dir": "immortalwrt"
