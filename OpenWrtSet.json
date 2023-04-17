@@ -3,15 +3,18 @@
     "select": {
         "Lienol": {
             "url": "https://github.com/Lienol/openwrt",
-            "branch": "21.02"
+            "branch": "21.02",
+            "dir": "openwrt"
         },
         "Lean": {
             "url": "https://github.com/coolsnowwolf/lede",
-            "branch": "master"
+            "branch": "master",
+            "dir": "leam"
         },
         "immortalwrt": {
             "url": "https://github.com/immortalwrt/immortalwrt",
-            "branch": "openwrt-21.02"
+            "branch": "openwrt-21.02",
+            "dir": "immortalwrt"
         }
     },
     "build": {
