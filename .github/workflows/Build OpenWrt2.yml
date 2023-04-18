@@ -1,4 +1,4 @@
-name: Build OpenWrt
+name: Build OpenWrt 2
 
 on:
   repository_dispatch:
@@ -48,7 +48,7 @@ jobs:
           fi 
 
           target="$(echo $json | jq .build.target)" 
-          if [ $OS != "" ]
+          if [ $target != "" ]
           echo "target=$target" >> $GITHUB_OUTPUT
           else
           echo "target=null" >> $GITHUB_OUTPUT
