@@ -41,7 +41,7 @@ jobs:
           
           json=$(cat OpenWrtSet.json)
           
-          liunx="$(echo $json | jq -r.Liunx)"
+          liunx="$(echo $json | jq -r .Liunx)"
           if [ -n "$liunx" ] && [ $liunx != "null" ]
           then
             echo "liunx=$liunx" >> $GITHUB_OUTPUT
@@ -57,7 +57,7 @@ jobs:
             echo "user=null" >> $GITHUB_OUTPUT
           fi
           
-          email="$(echo $json | jq -r.config.email)"
+          email="$(echo $json | jq -r .config.email)"
           if [ -n "$email" ]
           then
             echo "email=$email" >> $GITHUB_OUTPUT
