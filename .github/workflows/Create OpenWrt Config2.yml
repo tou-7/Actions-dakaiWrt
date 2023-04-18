@@ -67,14 +67,14 @@ jobs:
           
           repository="$(echo $json | jq .config.repository)"
           echo "repository=$repository" >> $GITHUB_OUTPUT
-          #if [ $repository != "" ]
-          #then
-          #  echo "repository=$repository" >> $GITHUB_OUTPUT
-          #else
-          #  echo "repository=null" >> $GITHUB_OUTPUT
-          #fi
+          if [ $repository != "" ]
+          then
+            echo "repository=$repository" >> $GITHUB_OUTPUT
+          else
+            echo "repository=null" >> $GITHUB_OUTPUT
+          fi
           
-          $myBranch="$(echo $json | jq .config.branch)" 
+          myBranch="$(echo $json | jq .config.branch)" 
           if [ $myBranch != "" ]
           then
             echo "myBranch=$myBranch" >> $GITHUB_OUTPUT  
