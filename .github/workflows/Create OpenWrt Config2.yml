@@ -170,6 +170,7 @@ jobs:
             echo "repoUrl=$osUrl" >> $GITHUB_ENV
             echo "repoBranch=$osBranch" >> $GITHUB_ENV
             echo "osDir=$osDir" >> $GITHUB_ENV
+            echo "cancelWorkflow=true" >> $GITHUB_ENV 
           else
             echo "cancelWorkflow=true" >> $GITHUB_ENV 
           fi
