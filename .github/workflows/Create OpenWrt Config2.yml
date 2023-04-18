@@ -84,9 +84,9 @@ jobs:
           
           osVersion="$(echo $json | jq .build.version)" 
           if [ $osVersion != "" ]
-          echo "osVersion=$osVersion" >> $GITHUB_OUTPUT
+            echo "osVersion=$osVersion" >> $GITHUB_OUTPUT
           else
-          echo "osVersion=null" >> $GITHUB_OUTPUT
+            echo "osVersion=null" >> $GITHUB_OUTPUT
           fi
           
           osBranch="$(echo $json | jq .build.branch)" 
