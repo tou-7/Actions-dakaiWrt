@@ -65,7 +65,7 @@ jobs:
             echo "email=null" >> $GITHUB_OUTPUT
           fi
           
-          repository="$(echo $json | jq .config.repository)"
+          repository="$(echo $json | jq -r .config.repository)"
           echo "repository=$repository" >> $GITHUB_OUTPUT
           if [ -n $repository ]
           then
@@ -74,7 +74,7 @@ jobs:
             echo "repository=null" >> $GITHUB_OUTPUT
           fi
           
-          myBranch="$(echo $json | jq .config.branch)" 
+          myBranch="$(echo $json | jq -r .config.branch)" 
           if [ -n $myBranch ]
           then
             echo "myBranch=$myBranch" >> $GITHUB_OUTPUT  
@@ -82,7 +82,7 @@ jobs:
             echo "myBranch=main" >> $GITHUB_OUTPUT
           fi
           
-          osVersion="$(echo $json | jq .build.version)" 
+          osVersion="$(echo $json | jq -r .build.version)" 
           if [ -n $osVersion ]
           then
             echo "osVersion=$osVersion" >> $GITHUB_OUTPUT
@@ -90,16 +90,16 @@ jobs:
             echo "osVersion=null" >> $GITHUB_OUTPUT
           fi
           
-          osBranch="$(echo $json | jq .build.branch)" 
+          osBranch="$(echo $json | jq -r .build.branch)" 
           if [ -n $osBranch ]
           then
             echo "branch=$osBranch" >> $GITHUB_OUTPUT
           else
-            osBranch="$(echo $json | jq .select.${osVersion}.branch)"
+            osBranch="$(echo $json | jq -r .select.${osVersion}.branch)"
             echo "branch=$osBranch" >> $GITHUB_OUTPUT
           fi
           
-          sh="$(echo $json | jq .config.shFile)"
+          sh="$(echo $json | jq -r .config.shFile)"
           if [ -n $sh ]
           then
              (echo $sh | grep -i -E "\.sh$") && echo "sh=$sh" >> $GITHUB_OUTPUT || echo "sh=${sh}.sh" >> $GITHUB_OUTPUT
@@ -162,8 +162,8 @@ jobs:
           sudo -E apt-get -qq install jq
           
           osBranch="${{needs.GetVer.outputs.branch}}" 
-          osUrl=$(cat OpenWrtSet.json | jq .select.${{env.osVersion}}.url)
-          osDir=$(cat OpenWrtSet.json | jq .select.${{env.osVersion}}.dir)
+          osUrl=$(cat OpenWrtSet.json | jq -r .select.${{env.osVersion}}.url)
+          osDir=$(cat OpenWrtSet.json | jq -r .select.${{env.osVersion}}.dir)
           
           if ![ $osUrl == "null" ] && ![ $osBranch == "null"]
           then 
