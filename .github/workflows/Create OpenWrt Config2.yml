@@ -35,6 +35,8 @@ jobs:
         uses: actions/checkout@main
 
       - id: Ver
+        env:
+          DEBIAN_FRONTEND: noninteractive
         run: |
           sudo -E apt-get -qq update
           sudo -E apt-get -qq install jq 
