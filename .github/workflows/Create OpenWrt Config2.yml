@@ -1,4 +1,4 @@
-name: Create OpenWrt Config
+name: Create OpenWrt Config 2
 
 on:
   repository_dispatch:
