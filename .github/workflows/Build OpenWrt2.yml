@@ -40,7 +40,7 @@ jobs:
           json=$(cat OpenWrtSet.json)
 
           liunx="$(echo $json | jq -r .Liunx)"
-          if [ -n $liunx ] && [ $liunx != "null" ]
+          if [ -n "$liunx" ] && [ $liunx != "null" ]
           then
             echo "liunx=$liunx" >> $GITHUB_OUTPUT
           else
@@ -48,7 +48,7 @@ jobs:
           fi 
 
           target="$(echo $json | jq -r .build.target)" 
-          if [ -n $target ]
+          if [ -n "$target" ]
           then
           echo "target=$target" >> $GITHUB_OUTPUT
           else
@@ -56,7 +56,7 @@ jobs:
           fi
 
           osVersion="$(echo $json | jq -r .build.version)" 
-          if [ -n $osVersion ]
+          if [ -n "$osVersion" ]
           then
           echo "osVersion=$osVersion" >> $GITHUB_OUTPUT
           else
@@ -64,7 +64,7 @@ jobs:
           fi
 
           osBranch="$(echo $json | jq -r .build.branch)" 
-          if [ -n $osBranch ]
+          if [ -n "$osBranch" ]
           then
             echo "branch=$osBranch" >> $GITHUB_OUTPUT
           else
