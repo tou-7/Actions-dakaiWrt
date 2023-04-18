@@ -108,23 +108,22 @@ jobs:
           osUrl=$(cat OpenWrtSet.json | jq -r .select.${{env.osVersion}}.url)
           osDir=$(cat OpenWrtSet.json | jq -r .select.${{env.osVersion}}.dir)
 
-          if ! [ $osUrl == "null" ] && ! [ $osBranch == "null"]
+          if ! [ $osUrl == "null" ] && ! [ $osBranch == "null" ]
           then 
             echo "repoUrl=$osUrl" >> $GITHUB_ENV
             echo "repoBranch=$osBranch" >> $GITHUB_ENV
-            echo "osDir=$osDir" >> $GITHUB_ENV
-            echo "cancelWorkflow=true" >> $GITHUB_ENV 
+            echo "osDir=$osDir" >> $GITHUB_ENV 
           else
             echo "cancelWorkflow=true" >> $GITHUB_ENV 
           fi
+          echo "cancelWorkflow=true" >> $GITHUB_ENV
 
       - name: 测试"${{matrix.target}}"平台配置文件
+        if: env.cancelWorkflow == 'false'
         run: |
           configFile=config/${{matrix.target}}\(${{env.osVersion}},${{env.repoBranch}}\).config 
-          if [ -e $configFile ] 
-          then
-            echo "cancelWorkflow=false" >> $GITHUB_ENV 
-          else  
+          if ! [ -e $configFile ] 
+          then  
             echo "cancelWorkflow=true" >> $GITHUB_ENV
           fi
 
