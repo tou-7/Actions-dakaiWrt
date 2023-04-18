@@ -42,7 +42,7 @@ jobs:
           json=$(cat OpenWrtSet.json)
           
           liunx="$(echo $json | jq .Liunx)"
-          if [ $liunx  != "" ] && [ $liunx != "null" ]
+          if [ -n $liunx ] && [ $liunx != "null" ]
           then
             echo "liunx=$liunx" >> $GITHUB_OUTPUT
           else
@@ -50,7 +50,7 @@ jobs:
           fi
           
           user="$(echo $json | jq .config.user)"
-          if [ $user != "" ]
+          if [ -n $user ]
           then
             echo "user=$user" >> $GITHUB_OUTPUT
           else
@@ -58,7 +58,7 @@ jobs:
           fi
           
           email="$(echo $json | jq .config.email)"
-          if [ $email != "" ]
+          if [ -n $email ]
           then
             echo "email=$email" >> $GITHUB_OUTPUT
           else
@@ -67,7 +67,7 @@ jobs:
           
           repository="$(echo $json | jq .config.repository)"
           echo "repository=$repository" >> $GITHUB_OUTPUT
-          if [ $repository != "" ]
+          if [ -n $repository ]
           then
             echo "repository=$repository" >> $GITHUB_OUTPUT
           else
@@ -75,7 +75,7 @@ jobs:
           fi
           
           myBranch="$(echo $json | jq .config.branch)" 
-          if [ $myBranch != "" ]
+          if [ -n $myBranch ]
           then
             echo "myBranch=$myBranch" >> $GITHUB_OUTPUT  
           else
@@ -83,7 +83,7 @@ jobs:
           fi
           
           osVersion="$(echo $json | jq .build.version)" 
-          if [ $osVersion != "" ]
+          if [ -n $osVersion ]
           then
             echo "osVersion=$osVersion" >> $GITHUB_OUTPUT
           else
@@ -91,7 +91,7 @@ jobs:
           fi
           
           osBranch="$(echo $json | jq .build.branch)" 
-          if [ $osBranch != "" ]
+          if [ -n $osBranch ]
           then
             echo "branch=$osBranch" >> $GITHUB_OUTPUT
           else
@@ -100,7 +100,7 @@ jobs:
           fi
           
           sh="$(echo $json | jq .config.shFile)"
-          if [ $sh != "" ]
+          if [ -n $sh ]
           then
              (echo $sh | grep -i -E "\.sh$") && echo "sh=$sh" >> $GITHUB_OUTPUT || echo "sh=${sh}.sh" >> $GITHUB_OUTPUT
           else
