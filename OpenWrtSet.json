@@ -22,7 +22,7 @@
         }
     },
     "build": {
-        "target": "x86",
+        "target": "r2s",
         "version": "Lean",
         "branch": ""
     },
