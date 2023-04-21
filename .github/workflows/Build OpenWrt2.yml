@@ -174,12 +174,12 @@ jobs:
         working-directory: ./${{env.osDir}}
         run: |
           ./scripts/feeds update -a 2>&1 | tee ../update.log
-          if grep -E -i erorr ../update.log
+          if grep -E -i "^\s*error\s*:" ../update.log
           then
             echo "cancelWorkflow=true" >> $GITHUB_ENV
           else
             ./scripts/feeds install -a 2>&1 | tee ../install.log
-            if grep -E -i erorr ../install.log
+            if grep -E -i "^\s*error\s*:" ../install.log
             then
               echo "cancelWorkflow=true" >> $GITHUB_ENV
             else
