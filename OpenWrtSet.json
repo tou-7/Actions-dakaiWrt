@@ -23,7 +23,7 @@
     },
     "build": {
         "target": "x86_64",
-        "version": "Lean",
+        "version": "Lienol",
         "branch": ""
     },
     "config": {
