@@ -23,8 +23,8 @@
     },
     "build": {
         "target": "x86_64",
-        "version": "Lienol",
-        "branch": ""
+        "version": "immortalwrt",
+        "branch": "openwrt-23.05"
     },
     "config": {
         "user": "tou-7",
