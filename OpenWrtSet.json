@@ -22,7 +22,7 @@
         }
     },
     "build": {
-        "target": "x86_64",
+        "target": "r2s",
         "version": "immortalwrt",
         "branch": "openwrt-23.05"
     },
