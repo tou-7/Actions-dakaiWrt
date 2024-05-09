@@ -23,8 +23,8 @@
     },
     "build": {
         "target": "r4s",
-        "version": "immortalwrt",
-        "branch": "openwrt-23.05"
+        "version": "Lean",
+        "branch": ""
     },
     "config": {
         "user": "tou-7",
