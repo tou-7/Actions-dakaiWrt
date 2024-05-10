@@ -22,9 +22,9 @@
         }
     },
     "build": {
-        "target": "r4s",
-        "version": "Lean",
-        "branch": ""
+        "target": "x86",
+        "version": "Lienol",
+        "branch": "23.05"
     },
     "config": {
         "user": "tou-7",
