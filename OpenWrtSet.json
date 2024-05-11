@@ -23,7 +23,7 @@
     },
     "build": {
         "target": "x86_64",
-        "version": "lean",
+        "version": "Lean",
         "branch": ""
     },
     "config": {
