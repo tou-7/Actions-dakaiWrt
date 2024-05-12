@@ -1,0 +1,290 @@
+name: Build OpenWrt 3
+
+on:
+  repository_dispatch:
+  workflow_dispatch:
+    inputs:
+      ssh:
+        description: "SSH connection to Actions"
+        required: false
+        default: "false"
+
+jobs:
+  GetVer:
+    if: github.event.repository.owner.id == github.event.sender.id
+
+    runs-on: ubuntu-latest
+
+    name: ${{matrix.target}}
+    strategy:
+      fail-fast: false
+      matrix:
+        target: ["获取指定的 OpenWrt 版本数据"]
+
+    outputs:
+      liunx: ${{ steps.Ver.outputs.liunx }}
+      target: ${{ steps.Ver.outputs.target }}
+      osVersion: ${{ steps.Ver.outputs.osVersion }}
+      branch: ${{ steps.Ver.outputs.branch }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@main
+
+      - id: Ver
+        run: |
+
+          sudo -E apt-get -qq update
+          sudo -E apt-get -qq install jq 
+        
+          json=$(cat OpenWrtSet.json)
+
+          liunx="$(echo $json | jq -r .Liunx)"
+          if [ -n "$liunx" ] && [ $liunx != "null" ]
+          then
+            echo "liunx=$liunx" >> $GITHUB_OUTPUT
+          else
+            echo "liunx=Ubuntu-20.04" >> $GITHUB_OUTPUT
+          fi 
+
+          target="$(echo $json | jq -r .build.target)" 
+          if [ -n "$target" ]
+          then
+          echo "target=$target" >> $GITHUB_OUTPUT
+          else
+          echo "target=null" >> $GITHUB_OUTPUT
+          fi
+
+          osVersion="$(echo $json | jq -r .build.version)" 
+          if [ -n "$osVersion" ]
+          then
+          echo "osVersion=$osVersion" >> $GITHUB_OUTPUT
+          else
+          echo "osVersion=null" >> $GITHUB_OUTPUT
+          fi
+
+          osBranch="$(echo $json | jq -r .build.branch)" 
+          if [ -n "$osBranch" ]
+          then
+            echo "branch=$osBranch" >> $GITHUB_OUTPUT
+          else
+            osBranch="$(echo $json | jq -r .select.${osVersion}.branch)"
+            echo "branch=$osBranch" >> $GITHUB_OUTPUT
+          fi
+
+  merge:
+    env:
+      uploadFirmware: true
+      uploadRelease: true
+      osVersion: ${{needs.GetVer.outputs.osVersion}}
+      # osVersion: Lienol, Lean, immortalwrt
+      delOldRelease: true
+      # TZ: Asia/Shanghai
+
+    if: github.event.repository.owner.id == github.event.sender.id
+
+    runs-on: ${{needs.GetVer.outputs.liunx}}
+
+    needs: GetVer
+
+    name: 构建"${{matrix.target}}(${{needs.GetVer.outputs.osVersion}},${{needs.GetVer.outputs.branch}})"固件
+    strategy:
+      fail-fast: false
+      matrix:
+        target: ["${{needs.GetVer.outputs.target}}"]
+        # target: nanopi-r2s, nanopi-r4s, x86_64
+
+    steps:
+      - name: 检查
+        uses: actions/checkout@main
+
+      - name: 固件选择(设为"${{env.osVersion}}"代码仓库)
+        # Lienol , Lean , immortalwrt
+        run: |
+          sudo -E apt-get -qq update
+          sudo -E apt-get -qq install jq 
+          
+          osBranch="${{needs.GetVer.outputs.branch}}" 
+          osUrl=$(cat OpenWrtSet.json | jq -r .select.${{env.osVersion}}.url)
+          osDir=$(cat OpenWrtSet.json | jq -r .select.${{env.osVersion}}.dir)
+
+          if ! [ $osUrl == "null" ] && ! [ $osBranch == "null" ]
+          then 
+            echo "repoUrl=$osUrl" >> $GITHUB_ENV
+            echo "repoBranch=$osBranch" >> $GITHUB_ENV
+            echo "osDir=$osDir" >> $GITHUB_ENV
+            echo "cancelWorkflow=false" >> $GITHUB_ENV 
+          else
+            echo "cancelWorkflow=true" >> $GITHUB_ENV 
+          fi
+
+      - name: 测试"${{matrix.target}}"平台配置文件
+        if: env.cancelWorkflow == 'false'
+        run: |
+          configFile=config/${{matrix.target}}\(${{env.osVersion}},${{env.repoBranch}}\).config 
+          if ! [ -e $configFile ] 
+          then  
+            echo "cancelWorkflow=true" >> $GITHUB_ENV
+          fi
+
+      - name: 初始化环境
+        if: env.cancelWorkflow == 'false'
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo -E chmod +x ./apt-get.sh && sudo -E ./apt-get.sh
+
+      - name: 设置当前的日期
+        if: env.cancelWorkflow == 'false'
+        id: date
+        run: |
+          echo "date=$(date +'%Y.%m.%d-%H%M')" >> $GITHUB_ENV
+          echo "date2=$(date +'%m/%d %Y')" >> $GITHUB_ENV
+          echo "date3=$(date +'%m.%d.%H')" >> $GITHUB_ENV
+          VERSION="$(echo "${{github.event.action}}" | grep -Eo " [0-9.]+" | sed -e 's/ //')" || true
+          [ "$VERSION" ] && echo "VERSION=$VERSION" >> $GITHUB_ENV || echo "VERSION=$(date +'%m.%d')" >> $GITHUB_ENV
+
+      - name: 克隆源代码
+        if: env.cancelWorkflow == 'false'
+        run: |
+          git clone --depth 1 ${{env.repoUrl}} -b ${{env.repoBranch}} ${{env.osDir}}
+          cd ${{env.osDir}}
+          if [ -e scripts/feeds ]
+          then
+            echo "cancelWorkflow=false" >> $GITHUB_ENV
+            if [ -e ../feedset.sh ]
+            then
+              cp ../feedset.sh feedset.sh
+              chmod +x ./feedset.sh && ./feedset.sh
+              sleep 1
+              rm feedset.sh
+            fi  
+          else
+            echo "cancelWorkflow=true" >> $GITHUB_ENV
+          fi
+
+      - name: feeds clean (Lienol)
+        if: env.osVersion == 'Lienol' && env.cancelWorkflow == 'false'
+        working-directory: ./${{env.osDir}}
+        run: |
+          ./scripts/feeds clean
+
+      - name: feeds update (共同)
+        if: env.cancelWorkflow == 'false'
+        working-directory: ./${{env.osDir}}
+        run: |
+          ./scripts/feeds update -a 2>&1 | tee ../update.log
+          if grep -E -i "^\s*error\s*:" ../update.log
+          then
+            echo "cancelWorkflow=true" >> $GITHUB_ENV
+          else
+            echo "cancelWorkflow=false" >> $GITHUB_ENV
+          fi
+
+      - name: 自定义配置 (${{matrix.target}})
+        if: env.cancelWorkflow == 'false'
+        run: |
+          configFile=config/${{matrix.target}}\(${{env.osVersion}},${{env.repoBranch}}\).config
+          mv $configFile ${{env.osDir}}/.config
+          mv customize.sh ${{env.osDir}}/customize.sh
+          cd "${{env.osDir}}"
+          chmod +x ./customize.sh && ./customize.sh
+          rm customize.sh
+          ./scripts/feeds install -a 2>&1 | tee ../install.log
+          if grep -E -i "^\s*error\s*:" ../install.log
+          then
+            echo "cancelWorkflow=true" >> $GITHUB_ENV
+          else
+            make defconfig
+            echo "cancelWorkflow=false" >> $GITHUB_ENV
+          fi          
+
+      - name: 下载包文件
+        if: env.cancelWorkflow == 'false'
+        working-directory: ./${{env.osDir}}
+        run: |
+          make download -j$(nproc)
+          find dl -size -1024c -exec rm -f {} \;
+
+      - name: 设置缓存
+        if: env.cancelWorkflow == 'false'
+        uses: klever1988/cachewrtbuild@main
+        with:
+          ccache: "true"
+          prefix: ${{env.osDir}}
+
+      - name: 编译固件
+        if: env.cancelWorkflow == 'false'
+        working-directory: ./${{env.osDir}}
+        run: |
+          echo -e "$(($(nproc)+1)) thread compile"
+          make -j$(($(nproc)+1)) || make -j1 V=s
+          #mkdir -p bin/targets/test/test/
+          #touch bin/targets/test/test/combined.txt
+          #touch bin/targets/test/test/sysupgrade.txt
+
+      - name: 检查空间使用情况
+        if: (!cancelled()) && env.cancelWorkflow == 'false'
+        run: df -hT
+
+      - name: 整理文件
+        id: organize
+        if: env.uploadFirmware == 'true' && !cancelled() && env.cancelWorkflow == 'false'
+        run: |
+          if find ${{env.osDir}}/bin/targets/*/*/*combined* || find ${{env.osDir}}/bin/targets/*/*/*sysupgrade*
+          then
+            echo "cancelWorkflow=false" >> $GITHUB_ENV
+            mkdir firmware
+            mv -f ${{env.osDir}}/bin/targets/*/*/{*combined*,*sysupgrade*} ./firmware/ 2>/dev/null || true
+            cp ${{env.osDir}}/.config  ./firmware/${{matrix.target}}.config
+            cp ${{env.osDir}}/build_dir/target-*/linux-*/linux-*/.config ./firmware/${{matrix.target}}_kernel.config     
+            cd firmware
+            echo "v${{ env.date3 }}" > version.txt
+            md5=$((md5sum *squashfs-sysupgrade* || md5sum *squashfs-combined-efi*) | awk '{print $1}') 2>/dev/null
+            echo $md5 >> version.txt
+            echo ${{matrix.target}}\(${{env.osVersion}},${{env.repoBranch}}\) >> version.txt     
+            rm -rf sha256sums
+            echo "FIRMWARE=$PWD" >> $GITHUB_ENV
+          else
+            echo "cancelWorkflow=true" >> $GITHUB_ENV
+          fi
+
+      - name: 生成发布标签
+        id: tag
+        if: env.uploadRelease == 'true' && !cancelled() && env.cancelWorkflow == 'false'
+        run: |
+          echo -e "源项目地址: ${{env.repoUrl}}" >> release.txt
+          credits=$(cat OpenWrtSet.json | jq -r .select.${{env.osVersion}}.credits)
+          echo -e $credits >> release.txt
+          credits=$(cat OpenWrtSet.json | jq -r .select.credits)
+          echo -e "${credits}\n" >> release.txt
+          echo -e "${{matrix.target}}(${{env.osVersion}},${{env.repoBranch}})固件下载:\n" >> release.txt
+          touch release.txt
+          echo "status=success" >> $GITHUB_OUTPUT
+          #echo "::set-output name=status::success"
+
+      - name: 上传固件发布
+        uses: softprops/action-gh-release@master
+        if: steps.tag.outputs.status == 'success' && !cancelled() && env.cancelWorkflow == 'false'
+        env:
+          GITHUB_TOKEN: ${{ secrets.REPO_TOKEN }} 
+        with:
+          files: "${{ env.FIRMWARE }}/*"
+          name: ${{ env.date2 }} ${{matrix.target}}
+          tag_name: ${{ env.date }}_${{matrix.target}}
+          body_path: release.txt
+
+      - name: 删除工作流
+        uses: Mattraks/delete-workflow-runs@main
+        with:
+          retain_days: 1
+          keep_minimum_runs: 0
+
+      - name: 删除旧版本
+        uses: dev-drprasad/delete-older-releases@master
+        if: env.delOldRelease == 'true' && env.uploadRelease == 'true' && !cancelled() && env.cancelWorkflow == 'false'
+        with:
+          keep_latest: 6
+          delete_tags: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.REPO_TOKEN }} #read/write
