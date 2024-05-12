@@ -1,0 +1,259 @@
+name: Create OpenWrt Config 3
+
+on:
+  repository_dispatch:
+  workflow_dispatch:
+    inputs:
+      ssh:
+        description: "SSH connection to Actions"
+        required: false
+        default: "false"
+
+jobs:
+  GetVer:
+    runs-on: ubuntu-latest
+    if: github.event.repository.owner.id == github.event.sender.id
+
+    name: ${{matrix.target}}
+    strategy:
+      fail-fast: false
+      matrix:
+        target: ["获取指定的 OpenWrt 版本数据"]
+
+    outputs:
+      liunx: ${{ steps.Ver.outputs.liunx }}
+      user: ${{ steps.Ver.outputs.user }}
+      email: ${{ steps.Ver.outputs.email }}
+      repository: ${{ steps.Ver.outputs.repository }}
+      myBranch: ${{ steps.Ver.outputs.myBranch }}
+      osVersion: ${{ steps.Ver.outputs.osVersion }}
+      branch: ${{ steps.Ver.outputs.branch }}
+      sh: ${{ steps.Ver.outputs.sh }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@main
+
+      - id: Ver
+        run: |
+          sudo -E apt-get -qq update
+          sudo -E apt-get -qq install jq
+
+          json=$(cat OpenWrtSet.json)
+
+          liunx="$(echo $json | jq -r .Liunx)"
+          if [ -n "$liunx" ] && [ $liunx != "null" ]
+          then
+            echo "liunx=$liunx" >> $GITHUB_OUTPUT
+          else
+            echo "liunx=Ubuntu-20.04" >> $GITHUB_OUTPUT
+          fi
+
+          user="$(echo $json | jq -r .config.user)"
+          if [ -n "$user" ]
+          then
+            echo "user=$user" >> $GITHUB_OUTPUT
+          else
+            echo "user=null" >> $GITHUB_OUTPUT
+          fi
+
+          email="$(echo $json | jq -r .config.email)"
+          if [ -n "$email" ]
+          then
+            echo "email=$email" >> $GITHUB_OUTPUT
+          else
+            echo "email=null" >> $GITHUB_OUTPUT
+          fi
+
+          repository="$(echo $json | jq -r .config.repository)"
+          echo "repository=$repository" >> $GITHUB_OUTPUT
+          if [ -n "$repository" ]
+          then
+            echo "repository=$repository" >> $GITHUB_OUTPUT
+          else
+            echo "repository=null" >> $GITHUB_OUTPUT
+          fi
+
+          myBranch="$(echo $json | jq -r .config.branch)" 
+          if [ -n "$myBranch" ]
+          then
+            echo "myBranch=$myBranch" >> $GITHUB_OUTPUT  
+          else
+            echo "myBranch=main" >> $GITHUB_OUTPUT
+          fi
+
+          osVersion="$(echo $json | jq -r .build.version)" 
+          if [ -n "$osVersion" ]
+          then
+            echo "osVersion=$osVersion" >> $GITHUB_OUTPUT
+          else
+            echo "osVersion=null" >> $GITHUB_OUTPUT
+          fi
+
+          osBranch="$(echo $json | jq -r .build.branch)" 
+          if [ -n "$osBranch" ]
+          then
+            echo "branch=$osBranch" >> $GITHUB_OUTPUT
+          else
+            osBranch="$(echo $json | jq -r .select.${osVersion}.branch)"
+            echo "branch=$osBranch" >> $GITHUB_OUTPUT
+          fi
+
+          sh="$(echo $json | jq -r .config.shFile)"
+          if [ -n "$sh" ]
+          then
+             (echo $sh | grep -i -E "\.sh$") && echo "sh=$sh" >> $GITHUB_OUTPUT || echo "sh=${sh}.sh" >> $GITHUB_OUTPUT
+          else
+            echo "sh=cowc.sh" >> $GITHUB_OUTPUT
+          fi
+
+  merge:
+    env:
+      osVersion: ${{needs.GetVer.outputs.osVersion}}
+      gitUser: ${{needs.GetVer.outputs.user}}
+      gitRepository: ${{needs.GetVer.outputs.repository}}
+      gitEmail: ${{needs.GetVer.outputs.email}}
+      shFile: ${{needs.GetVer.outputs.sh}}
+      # TZ: Asia/Shanghai
+
+    if: github.event.repository.owner.id == github.event.sender.id
+    runs-on: ${{needs.GetVer.outputs.liunx}}
+
+    needs: GetVer
+
+    name: 创建更新配置 "(本地:${{matrix.target}}分支 OpenWrt:${{needs.GetVer.outputs.osVersion}},${{needs.GetVer.outputs.branch}}版)"
+    strategy:
+      fail-fast: false
+      matrix:
+        target: ["${{needs.GetVer.outputs.myBranch}}"]
+
+    steps:
+      - name: 检查
+        uses: actions/checkout@main
+
+      - name: 设置git用户
+        run: |
+          if ! [ ${{env.gitEmail}} == "null" ] && ! [ ${{env.gitUser}} == "null"]
+          then
+            git config --global user.email ${{env.gitEmail}}
+            git config --global user.name ${{env.gitUser}}
+          else
+            git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git config --global user.name "github-actions[bot]"
+          fi
+          # sudo timedatectl set-timezone "Asia/Shanghai"
+
+      - name: 克隆自己仓库
+        run: |
+          git clone -b ${{matrix.target}} https://github.com/${{env.gitUser}}/${{env.gitRepository}}.git ${{env.gitRepository}} 
+          if [ -e ${{env.gitRepository}}/README.md ]
+          then
+            echo "cancelWorkflow=false" >> $GITHUB_ENV
+            #cd ${{env.gitRepository}}
+            #git rm -r --cache * >/dev/null 2>&1 &
+          else
+            echo "cancelWorkflow=true" >> $GITHUB_ENV
+          fi
+
+      - name: 固件选择(设为"${{env.osVersion}}"代码仓库)
+        if: env.cancelWorkflow == 'false'
+        run: |
+          sudo -E apt-get -qq update
+          sudo -E apt-get -qq install jq
+
+          osBranch="${{needs.GetVer.outputs.branch}}" 
+          osUrl=$(cat OpenWrtSet.json | jq -r .select.${{env.osVersion}}.url)
+          osDir=$(cat OpenWrtSet.json | jq -r .select.${{env.osVersion}}.dir)
+
+          if ! [ $osUrl == "null" ] && ! [ $osBranch == "null" ]
+          then 
+            echo "repoUrl=$osUrl" >> $GITHUB_ENV
+            echo "repoBranch=$osBranch" >> $GITHUB_ENV
+            echo "osDir=$osDir" >> $GITHUB_ENV
+          else
+            echo "cancelWorkflow=true" >> $GITHUB_ENV 
+          fi
+
+      - name: 初始化环境
+        if: env.cancelWorkflow == 'false'
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo -E chmod +x ./apt-get.sh && sudo -E ./apt-get.sh
+
+      - name: 克隆源代码
+        if: env.cancelWorkflow == 'false'
+        run: |
+          git clone --depth 1 ${{env.repoUrl}} -b ${{env.repoBranch}} ${{env.osDir}}
+          cd ${{env.osDir}}
+          if [ -e scripts/feeds ]
+          then
+            echo "cancelWorkflow=false" >> $GITHUB_ENV
+            if [ -e ../feedset.sh ]
+            then
+              cp ../feedset.sh feedset.sh
+              chmod +x ./feedset.sh && ./feedset.sh
+              sleep 1
+              rm feedset.sh
+            fi  
+          else
+            echo "cancelWorkflow=true" >> $GITHUB_ENV
+          fi
+
+      - name: feeds clean (Lienol)
+        if: env.osVersion == 'Lienol' && env.cancelWorkflow == 'false'
+        working-directory: ./${{env.osDir}}
+        run: |
+          ./scripts/feeds clean
+
+      - name: feeds update & install  (共同)
+        if: env.cancelWorkflow == 'false'
+        working-directory: ./${{env.osDir}}
+        run: |
+          echo "cancelWorkflow=true" >> $GITHUB_ENV
+          cp ../update_install.sh update_install.sh
+          chmod +x ./update_install.sh && ./update_install.sh
+          rm update_install.sh
+
+      - name: 创建 sh 脚本
+        if: env.cancelWorkflow == 'false'
+        run: |
+          echo cd ${{env.osDir}} > ./${{env.shFile}}
+          echo make menuconfig >> ./${{env.shFile}}
+          chmod +x ./${{env.shFile}}
+
+      - name: Start SSH via tmate
+        if: env.cancelWorkflow == 'false'
+        uses: P3TERX/ssh2actions@main
+
+      - name: 测试配置文件
+        if: env.cancelWorkflow == 'false'
+        run: |
+          # cd ${{env.osDir}}
+          if ls ${{env.osDir}}/*.config 
+          then
+            echo "cancelWorkflow=false" >> $GITHUB_ENV
+          else
+            echo "cancelWorkflow=true" >> $GITHUB_ENV
+          fi
+
+      - name: 更新自己仓库配置
+        if: env.cancelWorkflow == 'false'
+        env:
+          ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+        run: |
+          git -C ${{env.gitRepository}} pull
+          for file in $(ls ${{env.osDir}}/*.config | sed -r "s/^${{env.osDir}}(.*?)\.config$/\1/")
+          do 
+            cp -f ${{env.osDir}}/$file.config ${{env.gitRepository}}/config/$file\(${{env.osVersion}},${{env.repoBranch}}\).config 
+          done
+          cd ${{env.gitRepository}}
+          git add .
+          git commit -am "update $(date +%m-%d" "%H:%M:%S)"
+          git push --quiet "https://${{ secrets.ACCESS_TOKEN }}@github.com/${{env.gitUser}}/${{env.gitRepository}}" HEAD:${{matrix.target}}
+
+      - name: 删除工作流
+        uses: Mattraks/delete-workflow-runs@main
+        with:
+          retain_days: 1
+          keep_minimum_runs: 0
