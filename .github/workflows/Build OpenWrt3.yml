@@ -1,3 +1,4 @@
+
 name: Build OpenWrt 3
 
 on:
@@ -169,35 +170,22 @@ jobs:
         run: |
           ./scripts/feeds clean
 
-      - name: feeds update (共同)
+      - name: feeds update & update_install(共同)
         if: env.cancelWorkflow == 'false'
-        working-directory: ./${{env.osDir}}
         run: |
-          ./scripts/feeds update -a 2>&1 | tee ../update.log
-          if grep -E -i "^\s*error\s*:" ../update.log
-          then
-            echo "cancelWorkflow=true" >> $GITHUB_ENV
-          else
-            echo "cancelWorkflow=false" >> $GITHUB_ENV
-          fi
-
+          echo "cancelWorkflow=true" >> $GITHUB_ENV
+          chmod +x ./customize.sh && ./customize.sh
+          cd "${{env.osDir}}"
+          cp ../update_install.sh update_install.sh
+          chmod +x ./update_install.sh && ./update_install.sh
+          rm update_install.sh
+ 
       - name: 自定义配置 (${{matrix.target}})
         if: env.cancelWorkflow == 'false'
         run: |
           configFile=config/${{matrix.target}}\(${{env.osVersion}},${{env.repoBranch}}\).config
           mv $configFile ${{env.osDir}}/.config
-          mv customize.sh ${{env.osDir}}/customize.sh
-          cd "${{env.osDir}}"
-          chmod +x ./customize.sh && ./customize.sh
-          rm customize.sh
-          ./scripts/feeds install -a 2>&1 | tee ../install.log
-          if grep -E -i "^\s*error\s*:" ../install.log
-          then
-            echo "cancelWorkflow=true" >> $GITHUB_ENV
-          else
-            make defconfig
-            echo "cancelWorkflow=false" >> $GITHUB_ENV
-          fi          
+          cd "${{env.osDir}}" && make defconfig         
 
       - name: 下载包文件
         if: env.cancelWorkflow == 'false'
