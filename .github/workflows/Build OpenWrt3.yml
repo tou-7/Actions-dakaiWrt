@@ -205,8 +205,10 @@ jobs:
         if: env.cancelWorkflow == 'false'
         working-directory: ./${{env.osDir}}
         run: |
+          echo "cancelWorkflow=true" >> $GITHUB_ENV
           echo -e "$(($(nproc)+1)) thread compile"
           make -j$(($(nproc)+1)) || make -j1 V=s
+          echo "cancelWorkflow=false" >> $GITHUB_ENV
           #mkdir -p bin/targets/test/test/
           #touch bin/targets/test/test/combined.txt
           #touch bin/targets/test/test/sysupgrade.txt
