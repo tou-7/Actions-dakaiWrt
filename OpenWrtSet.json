@@ -23,8 +23,8 @@
     },
     "build": {
         "target": "x86_64",
-        "version": "Lienol",
-        "branch": "23.05"
+        "version": "Lean",
+        "branch": ""
     },
     "config": {
         "user": "tou-7",
