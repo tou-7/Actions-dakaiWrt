@@ -19,7 +19,7 @@
             "url": "https://github.com/immortalwrt/immortalwrt",
             "branch": "openwrt-21.02",
             "dir": "immortalwrt"
-        }
+        },
         "OpenWrt": {
             "credits":"感谢 OpenWrt原版 代码支持",
             "url": "https://github.com/openwrt/openwrt",
