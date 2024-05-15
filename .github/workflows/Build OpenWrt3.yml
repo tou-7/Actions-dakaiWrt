@@ -164,6 +164,15 @@ jobs:
             echo "cancelWorkflow=true" >> $GITHUB_ENV
           fi
 
+      - name: 创建软连接 (节约空间)
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo mkdir -p -m 777 /mnt/openwrt/dl /mnt/openwrt/bin /mnt/openwrt/staging_dir
+          ln -sf /mnt/openwrt/dl ${{env.osDir}}/dl
+          ln -sf /mnt/openwrt/bin ${{env.osDir}}/bin
+          ln -sf /mnt/openwrt/staging_dir ${{env.osDir}}/staging_dir
+
       - name: feeds clean (Lienol)
         if: env.osVersion == 'Lienol' && env.cancelWorkflow == 'false'
         working-directory: ./${{env.osDir}}
@@ -193,7 +202,7 @@ jobs:
         working-directory: ./${{env.osDir}}
         run: |
           make download -j$(nproc)
-          find dl -size -1024c -exec rm -f {} \;
+          #find dl -size -1024c -exec rm -f {} \;
 
       - name: 设置缓存
         if: env.cancelWorkflow == 'false'
