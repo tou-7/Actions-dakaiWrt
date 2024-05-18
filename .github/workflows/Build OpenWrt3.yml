@@ -229,8 +229,12 @@ jobs:
           #touch bin/targets/test/test/sysupgrade.txt
 
       - name: 检查空间使用情况
-        if: (!cancelled()) && env.cancelWorkflow == 'false'
-        run: df -hT
+        #if: (!cancelled()) && env.cancelWorkflow == 'false'
+        working-directory: ./${{env.osDir}}
+        run: |
+          df -hT
+          echo 编译已使用空间:;du -sh
+          
 
       - name: 整理文件
         id: organize
