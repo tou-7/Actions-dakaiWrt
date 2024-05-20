@@ -29,8 +29,8 @@
     },
     "build": {
         "target": "x86_64",
-        "version": "Lean",
-        "branch": ""
+        "version": "OpenWrt",
+        "branch": "openwrt-23.05"
     },
     "config": {
         "user": "tou-7",
