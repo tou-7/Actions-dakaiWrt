@@ -202,7 +202,9 @@ jobs:
         working-directory: ./${{env.osDir}}
         run: |
           make download -j$(nproc)
-          #find dl -size -1024c -exec rm -f {} \;
+          find dl -size -1024c -exec rm -f {} \;
+          sleep 3
+          make download -j$(nproc)
 
       - name: 设置缓存
         if: env.cancelWorkflow == 'false'
@@ -229,7 +231,7 @@ jobs:
           #touch bin/targets/test/test/sysupgrade.txt
 
       - name: 检查空间使用情况
-        #if: (!cancelled()) && env.cancelWorkflow == 'false'
+        if: (!cancelled()) && env.cancelWorkflow == 'false'
         working-directory: ./${{env.osDir}}
         run: |
           df -hT
