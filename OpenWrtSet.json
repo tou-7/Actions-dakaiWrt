@@ -28,9 +28,9 @@
         }
     },
     "build": {
-        "target": "x86_64",
-        "version": "OpenWrt",
-        "branch": "openwrt-23.05"
+        "target": "r2s",
+        "version": "Lean",
+        "branch": ""
     },
     "config": {
         "user": "tou-7",
@@ -40,3 +40,4 @@
         "shFile": "bb"
     }
 }
+
