@@ -99,6 +99,17 @@ jobs:
       - name: 检查
         uses: actions/checkout@main
 
+      - name: 释放 Ubuntu 空间
+        uses: coder-xiaomo/free-disk-space@main
+        with:
+          tool-cache: false
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: true
+          docker-images: true
+          swap-storage: true               
+
       - name: 固件选择(设为"${{env.osVersion}}"代码仓库)
         # Lienol , Lean , immortalwrt
         run: |
