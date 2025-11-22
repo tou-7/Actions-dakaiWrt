@@ -224,7 +224,9 @@ jobs:
 
       - name: Start SSH via tmate
         if: env.cancelWorkflow == 'false'
-        uses: P3TERX/ssh2actions@main
+        uses: mxschmitt/action-tmate@v3
+        with:
+          limit-access-to-actor: true
 
       - name: 测试配置文件
         if: env.cancelWorkflow == 'false'
