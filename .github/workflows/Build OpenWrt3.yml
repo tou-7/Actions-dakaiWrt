@@ -108,7 +108,12 @@ jobs:
           haskell: true
           large-packages: true
           docker-images: true
-          swap-storage: true               
+          swap-storage: true
+
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v6
+        with:
+          python-version: 3.8          
 
       - name: 固件选择(设为"${{env.osVersion}}"代码仓库)
         # Lienol , Lean , immortalwrt
