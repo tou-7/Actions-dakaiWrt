@@ -1,5 +1,6 @@
 #!/bin/bash
 
+chmod +x ./scripts/feeds
 ./scripts/feeds update -a 2>&1 | tee ../update.log
 if grep -E -i "^\s*error\s*:" ../update.log; then
     echo "cancelWorkflow=true" >>$GITHUB_ENV
