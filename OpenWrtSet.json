@@ -28,7 +28,7 @@
         }
     },
     "build": {
-        "target": "n30",
+        "target": "rax3000m",
         "version": "OpenWrt",
         "branch": ""
     },
