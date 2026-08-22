@@ -30,7 +30,7 @@
     "build": {
         "target": "rax3000m",
         "version": "OpenWrt",
-        "branch": "openwrt-24.12.8"
+        "branch": "immortalwrt-24.10.6"
     },
     "config": {
         "user": "tou-7",
