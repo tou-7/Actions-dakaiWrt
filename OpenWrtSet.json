@@ -23,14 +23,14 @@
         "OpenWrt": {
             "credits":"感谢 OpenWrt原版 代码支持",
             "url": "https://github.com/52709394/openwrt.git",
-            "branch": "main",
+            "branch": "openwrt-25.12.5",
             "dir": "openwrt"
         }
     },
     "build": {
-        "target": "n30",
+        "target": "rax3000m",
         "version": "OpenWrt",
-        "branch": ""
+        "branch": "openwrt-24.12.8"
     },
     "config": {
         "user": "tou-7",
