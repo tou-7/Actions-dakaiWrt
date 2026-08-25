@@ -28,9 +28,9 @@
         }
     },
     "build": {
-        "target": "rax3000m",
+        "target": "n30",
         "version": "OpenWrt",
-        "branch": "openwrt-24.10.8"
+        "branch": ""
     },
     "config": {
         "user": "tou-7",
