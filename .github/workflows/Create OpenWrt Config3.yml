@@ -225,6 +225,7 @@ jobs:
       - name: Start SSH via tmate
         if: env.cancelWorkflow == 'false'
         uses: mxschmitt/action-tmate@v3
+        timeout-minutes: 15
 
       - name: 测试配置文件
         if: env.cancelWorkflow == 'false'
