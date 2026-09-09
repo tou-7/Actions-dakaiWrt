@@ -180,6 +180,7 @@ jobs:
           DEBIAN_FRONTEND: noninteractive
         run: |
           sudo -E chmod +x ./apt-get.sh && sudo -E ./apt-get.sh
+          sudo apt-get install -y tmate
 
       - name: 克隆源代码
         if: env.cancelWorkflow == 'false'
@@ -222,11 +223,18 @@ jobs:
           echo make menuconfig >> ./${{env.shFile}}
           chmod +x ./${{env.shFile}}
 
-      - name: Start SSH via tmate
+      - name: Start SSH session
         if: env.cancelWorkflow == 'false'
-        uses: mxschmitt/action-tmate@v3
-        timeout-minutes: 15
+        run: |
+          tmate -S /tmp/tmate.sock new-session -d
+          tmate -S /tmp/tmate.sock wait tmate-ready
 
+          echo "======================================"
+          tmate -S /tmp/tmate.sock display -p '#{tmate_ssh}'
+          echo "======================================"
+
+          tmate -S /tmp/tmate.sock wait tmate-exit
+          
       - name: 测试配置文件
         if: env.cancelWorkflow == 'false'
         run: |
