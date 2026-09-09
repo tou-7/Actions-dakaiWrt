@@ -8,4 +8,4 @@ jobs:
     - name: Setup tmate session
       uses: mxschmitt/action-tmate@v3
       with:
-        detached: true
+        install-dependencies: false
