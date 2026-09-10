@@ -129,7 +129,7 @@ jobs:
 
     steps:
       - name: 检查
-        uses: actions/checkout@v4
+        uses: actions/checkout@main
 
       - name: 设置git用户
         run: |
@@ -180,7 +180,6 @@ jobs:
           DEBIAN_FRONTEND: noninteractive
         run: |
           sudo -E chmod +x ./apt-get.sh && sudo -E ./apt-get.sh
-          sudo apt-get install -y tmate
 
       - name: 克隆源代码
         if: env.cancelWorkflow == 'false'
@@ -223,18 +222,10 @@ jobs:
           echo make menuconfig >> ./${{env.shFile}}
           chmod +x ./${{env.shFile}}
 
-      - name: Start SSH session
+      - name: Start SSH via tmate
         if: env.cancelWorkflow == 'false'
-        run: |
-          tmate -S /tmp/tmate.sock new-session -d
-          tmate -S /tmp/tmate.sock wait tmate-ready
+        uses: mxschmitt/action-tmate@v3
 
-          echo "======================================"
-          tmate -S /tmp/tmate.sock display -p '#{tmate_ssh}'
-          echo "======================================"
-
-          tmate -S /tmp/tmate.sock wait tmate-exit
-          
       - name: 测试配置文件
         if: env.cancelWorkflow == 'false'
         run: |
