@@ -224,7 +224,12 @@ jobs:
 
       - name: Start SSH via tmate
         if: env.cancelWorkflow == 'false'
-        uses: P3TERX/ssh2actions@main
+        uses: mxschmitt/action-tmate@v3
+        with:
+          tmate-server-host: 192.3.221.220
+          tmate-server-port: 2222
+          tmate-server-rsa-fingerprint: SHA256:Fo2tKldXo6Mr92C6WTvGwV36Xq4O+3uWAjUxVr2Kz5U
+          tmate-server-ed25519-fingerprint: SHA256:yUJcn1v8lgD+WlRulrnmz0/+AH8RxSJp6Fr3spw/hyw
 
       - name: 测试配置文件
         if: env.cancelWorkflow == 'false'
