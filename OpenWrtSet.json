@@ -28,7 +28,7 @@
         }
     },
     "build": {
-        "target": "r2s",
+        "target": "rax3000me",
         "version": "OpenWrt",
         "branch": "immortalwrt-24.10.6"
     },
