@@ -200,8 +200,9 @@ jobs:
         run: |
           echo "cancelWorkflow=true" >> $GITHUB_ENV
           echo "makeJ1Model=false" >> $GITHUB_ENV
-          chmod +x ./customize.sh && ./customize.sh
           cd "${{env.osDir}}"
+          cp ../customize.sh customize.sh
+          chmod +x ./customize.sh && ./customize.sh
           cp ../update_install.sh update_install.sh
           chmod +x ./update_install.sh && ./update_install.sh
           rm update_install.sh
