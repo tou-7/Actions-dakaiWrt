@@ -30,7 +30,7 @@ wget -O package/base-files/files/etc/opkg/keys/0abda65a492b4887 \
 
 #===============================================
 # # apk 第三方源
-# mkdir -p package/base-files/files/etc/apk/repositories.d/customfeeds.list
+# mkdir -p package/base-files/files/etc/apk/repositories.d
 
 # cat > package/base-files/files/etc/apk/repositories.d/customfeeds.list <<EOF
 # https://master.dl.sourceforge.net/project/openwrt-passwall-build/releases/packages-$release/$arch/passwall_luci/packages.adb
