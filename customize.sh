@@ -28,3 +28,18 @@ mkdir -p package/base-files/files/etc/opkg/keys
 wget -O package/base-files/files/etc/opkg/keys/0abda65a492b4887 \
     https://master.dl.sourceforge.net/project/openwrt-passwall-build/ipk.pub
 
+#===============================================
+# # apk 第三方源
+# mkdir -p package/base-files/files/etc/apk/repositories.d/customfeeds.list
+
+# cat > package/base-files/files/etc/apk/repositories.d/customfeeds.list <<EOF
+# https://master.dl.sourceforge.net/project/openwrt-passwall-build/releases/packages-$release/$arch/passwall_luci/packages.adb
+# https://master.dl.sourceforge.net/project/openwrt-passwall-build/releases/packages-$release/$arch/passwall_packages/packages.adb
+# https://master.dl.sourceforge.net/project/openwrt-passwall-build/releases/packages-$release/$arch/passwall2/packages.adb
+# EOF
+
+# # apk 公钥
+# mkdir -p package/base-files/files/etc/apk/keys
+
+# wget -O package/base-files/files/etc/apk/keys/openwrt-passwall-build.pem \
+#     https://master.dl.sourceforge.net/project/openwrt-passwall-build/apk.pub
