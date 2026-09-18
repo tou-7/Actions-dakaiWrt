@@ -201,9 +201,6 @@ jobs:
           echo "cancelWorkflow=true" >> $GITHUB_ENV
           echo "makeJ1Model=false" >> $GITHUB_ENV
           cd "${{env.osDir}}"
-          cp ../customize.sh customize.sh
-          chmod +x ./customize.sh && ./customize.sh
-          rm customize.sh
           cp ../update_install.sh update_install.sh
           chmod +x ./update_install.sh && ./update_install.sh
           rm update_install.sh
@@ -213,8 +210,16 @@ jobs:
         run: |
           configFile=config/${{matrix.target}}\(${{env.osVersion}},${{env.repoBranch}}\).config
           mv $configFile ${{env.osDir}}/.config
-          cd "${{env.osDir}}" && make defconfig         
+          cd "${{env.osDir}}" && make defconfig
 
+      - name: my customize
+        if: env.cancelWorkflow == 'false'
+        run: |
+          cd "${{env.osDir}}"
+          cp ../customize.sh customize.sh
+          chmod +x ./customize.sh && ./customize.sh
+          rm customize.sh
+        
       - name: 下载包文件
         if: env.cancelWorkflow == 'false'
         working-directory: ./${{env.osDir}}
