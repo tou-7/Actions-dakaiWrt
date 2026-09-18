@@ -38,8 +38,13 @@ https://master.dl.sourceforge.net/project/openwrt-passwall-build/releases/packag
 https://master.dl.sourceforge.net/project/openwrt-passwall-build/releases/packages-$release/$arch/passwall2/packages.adb
 EOF
 
+cat package/base-files/files/etc/apk/repositories.d/customfeeds.list
+
 # apk 公钥
 mkdir -p package/base-files/files/etc/apk/keys
 
 wget -O package/base-files/files/etc/apk/keys/openwrt-passwall-build.pem \
     https://master.dl.sourceforge.net/project/openwrt-passwall-build/apk.pub
+
+cat package/base-files/files/etc/apk/keys/openwrt-passwall-build.pem
+    
