@@ -10,8 +10,8 @@
 #echo "makeJ1Model=true" >> $GITHUB_ENV
 #===============================================
 
-# release=25.12
-# arch=aarch64_cortex-a53
+release=25.12
+arch=aarch64_cortex-a53
 
 # # OPKG 第三方源
 # mkdir -p package/base-files/files/etc/opkg
