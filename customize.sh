@@ -48,6 +48,6 @@ wget -O package/base-files/files/etc/apk/keys/openwrt-passwall-build.pem \
 
 cat package/base-files/files/etc/apk/keys/openwrt-passwall-build.pem
 
-make package/base-files/clean
-make package/base-files/compile V=s
+# make package/base-files/clean
+# make package/base-files/compile V=s
     
