@@ -29,25 +29,27 @@ arch=aarch64_cortex-a53
 #     https://master.dl.sourceforge.net/project/openwrt-passwall-build/ipk.pub
 
 #===============================================
-# apk 第三方源
-mkdir -p package/base-files/files/etc/apk/repositories.d
+# # apk 第三方源
+# mkdir -p package/base-files/files/etc/apk/repositories.d
 
-cat > package/base-files/files/etc/apk/repositories.d/customfeeds.list <<EOF
-https://master.dl.sourceforge.net/project/openwrt-passwall-build/releases/packages-$release/$arch/passwall_luci/packages.adb
-https://master.dl.sourceforge.net/project/openwrt-passwall-build/releases/packages-$release/$arch/passwall_packages/packages.adb
-https://master.dl.sourceforge.net/project/openwrt-passwall-build/releases/packages-$release/$arch/passwall2/packages.adb
-EOF
+# cat > package/base-files/files/etc/apk/repositories.d/customfeeds.list <<EOF
+# https://master.dl.sourceforge.net/project/openwrt-passwall-build/releases/packages-$release/$arch/passwall_luci/packages.adb
+# https://master.dl.sourceforge.net/project/openwrt-passwall-build/releases/packages-$release/$arch/passwall_packages/packages.adb
+# https://master.dl.sourceforge.net/project/openwrt-passwall-build/releases/packages-$release/$arch/passwall2/packages.adb
+# EOF
 
-cat package/base-files/files/etc/apk/repositories.d/customfeeds.list
+# cat package/base-files/files/etc/apk/repositories.d/customfeeds.list
 
-# apk 公钥
-mkdir -p package/base-files/files/etc/apk/keys
+# # apk 公钥
+# mkdir -p package/base-files/files/etc/apk/keys
 
-wget -O package/base-files/files/etc/apk/keys/openwrt-passwall-build.pem \
-    https://master.dl.sourceforge.net/project/openwrt-passwall-build/apk.pub
+# wget -O package/base-files/files/etc/apk/keys/openwrt-passwall-build.pem \
+#     https://master.dl.sourceforge.net/project/openwrt-passwall-build/apk.pub
 
-cat package/base-files/files/etc/apk/keys/openwrt-passwall-build.pem
+# cat package/base-files/files/etc/apk/keys/openwrt-passwall-build.pem
 
-# make package/base-files/clean
-# make package/base-files/compile V=s
+make package/base-files/clean
+make package/base-files/compile V=s
+
+echo "cancelWorkflow=false" >>$GITHUB_ENV
     
