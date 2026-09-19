@@ -50,7 +50,7 @@ cat package/base-files/files/etc/apk/keys/openwrt-passwall-build.pem
 
 make tools/libdeflate/compile V=s
 
-ls -lah staging_dir/host/bin/libdeflate*
+ls -lah staging_dir/host/bin/libdeflate-gzip
 
 make package/base-files/clean
 make package/base-files/compile V=s
