@@ -51,6 +51,8 @@
 #=======================================================================
 mkdir -p package/base-files/files/etc/uci-defaults
 
+chmod -R 777 package/base-files/
+
 cp ../99-my-init package/base-files/files/etc/uci-defaults/99-my-init
 
 chmod +x package/base-files/files/etc/uci-defaults/99-my-init 
