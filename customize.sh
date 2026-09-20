@@ -10,40 +10,40 @@
 #echo "makeJ1Model=true" >> $GITHUB_ENV
 #===============================================
 
-release=25.12
+release=24.10
 arch=aarch64_cortex-a53
 
-# # OPKG 第三方源
-# mkdir -p files/etc/opkg
+# OPKG 第三方源
+mkdir -p files/etc/opkg
 
-# cat > files/etc/opkg/customfeeds.conf <<EOF
-# src/gz passwall_luci https://master.dl.sourceforge.net/project/openwrt-passwall-build/releases/packages-$release/$arch/passwall_luci
-# src/gz passwall_packages https://master.dl.sourceforge.net/project/openwrt-passwall-build/releases/packages-$release/$arch/passwall_packages
-# src/gz passwall2 https://master.dl.sourceforge.net/project/openwrt-passwall-build/releases/packages-$release/$arch/passwall2
-# EOF
+cat > files/etc/opkg/customfeeds.conf <<EOF
+src/gz passwall_luci https://master.dl.sourceforge.net/project/openwrt-passwall-build/releases/packages-$release/$arch/passwall_luci
+src/gz passwall_packages https://master.dl.sourceforge.net/project/openwrt-passwall-build/releases/packages-$release/$arch/passwall_packages
+src/gz passwall2 https://master.dl.sourceforge.net/project/openwrt-passwall-build/releases/packages-$release/$arch/passwall2
+EOF
 
-# # OPKG 公钥
-# mkdir -p files/etc/opkg/keys
+# OPKG 公钥
+mkdir -p files/etc/opkg/keys
 
-# wget -O files/etc/opkg/keys/0abda65a492b4887 \
-#     https://master.dl.sourceforge.net/project/openwrt-passwall-build/ipk.pub
+wget -O files/etc/opkg/keys/0abda65a492b4887 \
+    https://master.dl.sourceforge.net/project/openwrt-passwall-build/ipk.pub
 
 #===============================================
 # apk 第三方源
-mkdir -p files/etc/apk/repositories.d
+# mkdir -p files/etc/apk/repositories.d
 
-cat > files/etc/apk/repositories.d/customfeeds.list <<EOF
-https://master.dl.sourceforge.net/project/openwrt-passwall-build/releases/packages-$release/$arch/passwall_luci/packages.adb
-https://master.dl.sourceforge.net/project/openwrt-passwall-build/releases/packages-$release/$arch/passwall_packages/packages.adb
-https://master.dl.sourceforge.net/project/openwrt-passwall-build/releases/packages-$release/$arch/passwall2/packages.adb
-EOF
+# cat > files/etc/apk/repositories.d/customfeeds.list <<EOF
+# https://master.dl.sourceforge.net/project/openwrt-passwall-build/releases/packages-$release/$arch/passwall_luci/packages.adb
+# https://master.dl.sourceforge.net/project/openwrt-passwall-build/releases/packages-$release/$arch/passwall_packages/packages.adb
+# https://master.dl.sourceforge.net/project/openwrt-passwall-build/releases/packages-$release/$arch/passwall2/packages.adb
+# EOF
 
-cat files/etc/apk/repositories.d/customfeeds.list
+# cat files/etc/apk/repositories.d/customfeeds.list
 
-# apk 公钥
-mkdir -p files/etc/apk/keys
+# # apk 公钥
+# mkdir -p files/etc/apk/keys
 
-wget -O files/etc/apk/keys/openwrt-passwall-build.pem \
-    https://master.dl.sourceforge.net/project/openwrt-passwall-build/apk.pub
+# wget -O files/etc/apk/keys/openwrt-passwall-build.pem \
+#     https://master.dl.sourceforge.net/project/openwrt-passwall-build/apk.pub
 
-cat files/etc/apk/keys/openwrt-passwall-build.pem
+# cat files/etc/apk/keys/openwrt-passwall-build.pem
