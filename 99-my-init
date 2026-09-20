@@ -1,0 +1,32 @@
+#!/bin/sh
+
+echo "执行首次启动初始化"
+
+# 创建 APK 密钥目录
+mkdir -p /etc/apk/keys
+
+# 写入 Passwall 软件源公钥
+cat > /etc/apk/keys/openwrt-passwall-build.pem <<'EOF'
+-----BEGIN PUBLIC KEY-----
+MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEOmXHYLJGWFQCtbWqDqlxMvcAvkZZ
+Owy7UzzBIOxrGSAiu1blMeX96Q55Q9PH5GyjPwYiT4nrrwRgIttggGK62w==
+-----END PUBLIC KEY-----
+EOF
+
+# 读取 OpenWrt 版本和架构
+. /etc/openwrt_release
+
+release="${DISTRIB_RELEASE%.*}"
+arch="$DISTRIB_ARCH"
+
+# 创建软件源目录和文件
+mkdir -p /etc/apk/repositories.d
+touch /etc/apk/repositories.d/customfeeds.list
+
+# 添加 Passwall 软件源
+for feed in passwall_luci passwall_packages passwall2; do
+    echo "https://master.dl.sourceforge.net/project/openwrt-passwall-build/releases/packages-$release/$arch/$feed/packages.adb" \
+        >> /etc/apk/repositories.d/customfeeds.list
+done
+
+exit 0
