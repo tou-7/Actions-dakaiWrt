@@ -14,18 +14,18 @@ release=25.12
 arch=aarch64_cortex-a53
 
 # # OPKG 第三方源
-# mkdir -p package/base-files/files/etc/opkg
+# mkdir -p files/etc/opkg
 
-# cat > package/base-files/files/etc/opkg/customfeeds.conf <<EOF
+# cat > files/etc/opkg/customfeeds.conf <<EOF
 # src/gz passwall_luci https://master.dl.sourceforge.net/project/openwrt-passwall-build/releases/packages-$release/$arch/passwall_luci
 # src/gz passwall_packages https://master.dl.sourceforge.net/project/openwrt-passwall-build/releases/packages-$release/$arch/passwall_packages
 # src/gz passwall2 https://master.dl.sourceforge.net/project/openwrt-passwall-build/releases/packages-$release/$arch/passwall2
 # EOF
 
 # # OPKG 公钥
-# mkdir -p package/base-files/files/etc/opkg/keys
+# mkdir -p files/etc/opkg/keys
 
-# wget -O package/base-files/files/etc/opkg/keys/0abda65a492b4887 \
+# wget -O files/etc/opkg/keys/0abda65a492b4887 \
 #     https://master.dl.sourceforge.net/project/openwrt-passwall-build/ipk.pub
 
 #===============================================
@@ -47,19 +47,3 @@ wget -O files/etc/apk/keys/openwrt-passwall-build.pem \
     https://master.dl.sourceforge.net/project/openwrt-passwall-build/apk.pub
 
 cat files/etc/apk/keys/openwrt-passwall-build.pem
-
-#=======================================================================
-# mkdir -p package/base-files/files/etc/uci-defaults
-
-# chmod -R 777 package/base-files/
-
-# cp ../99-my-init package/base-files/files/etc/uci-defaults/99-my-init
-
-# chmod +x package/base-files/files/etc/uci-defaults/99-my-init 
-
-# cat package/base-files/files/etc/uci-defaults/99-my-init
-
-# make package/base-files/clean
-# make package/base-files/compile V=s
-
-    
