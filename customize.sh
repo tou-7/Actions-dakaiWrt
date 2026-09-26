@@ -10,6 +10,31 @@
 #echo "makeJ1Model=true" >> $GITHUB_ENV
 #===============================================
 
+sudo -E apt-get -qq install lld
+
+unset CLANG
+unset LLVM
+unset LLVM_CONFIG
+
+echo "clang: $(command -v clang)"
+clang --version
+
+echo "=== LLVM/Clang 环境 ==="
+which clang || true
+clang --version || true
+which clang-18 || true
+clang-18 --version || true
+which clang-17 || true
+clang-17 --version || true
+
+echo "=== 环境变量 ==="
+env | grep -Ei 'clang|llvm|bpf' || true
+
+echo "=== OpenWrt 配置 ==="
+grep -E 'LLVM|CLANG|BPF' .config || true
+
+#===============================================
+
 release=$(cat ../OpenWrtSet.json | jq -r .build.release)
 arch=$(cat ../OpenWrtSet.json | jq -r .build.arch)
 
@@ -26,7 +51,7 @@ if [[ "$release" =~ ^[0-9]{2}\.[0-9]{2}$ ]]; then
           echo "https://master.dl.sourceforge.net/project/openwrt-passwall-build/releases/packages-$release/$arch/$feed/packages.adb" >> files/etc/apk/repositories.d/customfeeds.list
         done        
         
-        cat files/etc/apk/repositories.d/customfeeds.list
+        # cat files/etc/apk/repositories.d/customfeeds.list
         
         # apk 公钥
         mkdir -p files/etc/apk/keys
@@ -34,7 +59,7 @@ if [[ "$release" =~ ^[0-9]{2}\.[0-9]{2}$ ]]; then
         wget -O files/etc/apk/keys/openwrt-passwall-build.pem \
             https://master.dl.sourceforge.net/project/openwrt-passwall-build/apk.pub
         
-        cat files/etc/apk/keys/openwrt-passwall-build.pem
+        # cat files/etc/apk/keys/openwrt-passwall-build.pem
     else
         # OPKG 第三方源
         mkdir -p files/etc/opkg
@@ -45,7 +70,7 @@ if [[ "$release" =~ ^[0-9]{2}\.[0-9]{2}$ ]]; then
           echo "src/gz $feed https://master.dl.sourceforge.net/project/openwrt-passwall-build/releases/packages-$release/$arch/$feed" >> files/etc/opkg/customfeeds.conf
         done
 
-        cat files/etc/opkg/customfeeds.conf
+        # cat files/etc/opkg/customfeeds.conf
         
         # OPKG 公钥
         mkdir -p files/etc/opkg/keys
@@ -53,7 +78,7 @@ if [[ "$release" =~ ^[0-9]{2}\.[0-9]{2}$ ]]; then
         wget -O files/etc/opkg/keys/0abda65a492b4887 \
             https://master.dl.sourceforge.net/project/openwrt-passwall-build/ipk.pub
 
-       cat files/etc/opkg/keys/0abda65a492b4887     
+       # cat files/etc/opkg/keys/0abda65a492b4887     
     fi
 fi
 
