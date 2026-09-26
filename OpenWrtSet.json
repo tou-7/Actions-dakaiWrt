@@ -30,7 +30,9 @@
     "build": {
         "target": "rax3000m",
         "version": "OpenWrt",
-        "branch": "immortalwrt-24.10.6"
+        "branch": "immortalwrt-24.10.6",
+        "release":"24.10",
+        "arch":"aarch64_cortex-a53"
     },
     "config": {
         "user": "tou-7",
