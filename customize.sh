@@ -10,8 +10,8 @@
 #echo "makeJ1Model=true" >> $GITHUB_ENV
 #===============================================
 
-release="24.10"
-arch="aarch64_cortex-a53"
+release=$(cat ../OpenWrtSet.json | jq -r .build.release)
+arch=$(cat ../OpenWrtSet.json | jq -r .build.arch)
 
 if [[ "$release" =~ ^[0-9]{2}\.[0-9]{2}$ ]]; then
     version="${release%%.*}"
@@ -52,3 +52,5 @@ if [[ "$release" =~ ^[0-9]{2}\.[0-9]{2}$ ]]; then
             https://master.dl.sourceforge.net/project/openwrt-passwall-build/ipk.pub
     fi
 fi
+
+echo "cancelWorkflow=true" >>$GITHUB_ENV
