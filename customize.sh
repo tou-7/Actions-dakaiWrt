@@ -20,11 +20,11 @@ if [[ "$release" =~ ^[0-9]{2}\.[0-9]{2}$ ]]; then
         apk 第三方源
         mkdir -p files/etc/apk/repositories.d
         
-        cat > files/etc/apk/repositories.d/customfeeds.list <<EOF
-        https://master.dl.sourceforge.net/project/openwrt-passwall-build/releases/packages-$release/$arch/passwall_luci/packages.adb
-        https://master.dl.sourceforge.net/project/openwrt-passwall-build/releases/packages-$release/$arch/passwall_packages/packages.adb
-        https://master.dl.sourceforge.net/project/openwrt-passwall-build/releases/packages-$release/$arch/passwall2/packages.adb
-        EOF
+        touch files/etc/apk/repositories.d/customfeeds.list
+        
+        for feed in passwall_luci passwall_packages passwall2; do
+          echo "https://master.dl.sourceforge.net/project/openwrt-passwall-build/releases/packages-$release/$arch/$feed/packages.adb" >> files/etc/apk/repositories.d/customfeeds.list
+        done        
         
         cat files/etc/apk/repositories.d/customfeeds.list
         
@@ -38,12 +38,12 @@ if [[ "$release" =~ ^[0-9]{2}\.[0-9]{2}$ ]]; then
     else
         # OPKG 第三方源
         mkdir -p files/etc/opkg
+
+        touch files/etc/opkg/customfeeds.conf
         
-        cat > files/etc/opkg/customfeeds.conf <<EOF
-        src/gz passwall_luci https://master.dl.sourceforge.net/project/openwrt-passwall-build/releases/packages-$release/$arch/passwall_luci
-        src/gz passwall_packages https://master.dl.sourceforge.net/project/openwrt-passwall-build/releases/packages-$release/$arch/passwall_packages
-        src/gz passwall2 https://master.dl.sourceforge.net/project/openwrt-passwall-build/releases/packages-$release/$arch/passwall2
-        EOF
+        for feed in passwall_luci passwall_packages passwall2; do
+          echo "src/gz $feed https://master.dl.sourceforge.net/project/openwrt-passwall-build/releases/packages-$release/$arch/$feed" >> files/etc/opkg/customfeeds.conf
+        done
         
         # OPKG 公钥
         mkdir -p files/etc/opkg/keys
