@@ -57,4 +57,3 @@ if [[ "$release" =~ ^[0-9]{2}\.[0-9]{2}$ ]]; then
     fi
 fi
 
-echo "cancelWorkflow=true" >>$GITHUB_ENV
