@@ -44,12 +44,16 @@ if [[ "$release" =~ ^[0-9]{2}\.[0-9]{2}$ ]]; then
         for feed in passwall_luci passwall_packages passwall2; do
           echo "src/gz $feed https://master.dl.sourceforge.net/project/openwrt-passwall-build/releases/packages-$release/$arch/$feed" >> files/etc/opkg/customfeeds.conf
         done
+
+        cat files/etc/opkg/customfeeds.conf
         
         # OPKG 公钥
         mkdir -p files/etc/opkg/keys
         
         wget -O files/etc/opkg/keys/0abda65a492b4887 \
             https://master.dl.sourceforge.net/project/openwrt-passwall-build/ipk.pub
+
+       cat files/etc/opkg/keys/0abda65a492b4887     
     fi
 fi
 
