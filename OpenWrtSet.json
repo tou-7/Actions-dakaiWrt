@@ -31,7 +31,7 @@
         "target": "rax3000m",
         "version": "immortalwrt",
         "branch": "openwrt-24.10",
-        "release":"24.10",
+        "release":"24.10.6",
         "arch":"aarch64_cortex-a53"
     },
     "config": {
