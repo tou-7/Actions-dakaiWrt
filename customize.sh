@@ -42,7 +42,7 @@ if [[ "$release" =~ ^[0-9]{2}\.[0-9]{2}$ ]]; then
     version="${release%%.*}"
 
     if (( version > 24 )); then
-        apk 第三方源
+        # apk 第三方源
         mkdir -p files/etc/apk/repositories.d
         
         touch files/etc/apk/repositories.d/customfeeds.list
