@@ -10,28 +10,6 @@
 #echo "makeJ1Model=true" >> $GITHUB_ENV
 #===============================================
 
-sudo -E apt-get -qq install lld
-
-unset CLANG
-unset LLVM
-unset LLVM_CONFIG
-
-echo "clang: $(command -v clang)"
-clang --version
-
-echo "=== LLVM/Clang 环境 ==="
-which clang || true
-clang --version || true
-which clang-18 || true
-clang-18 --version || true
-which clang-17 || true
-clang-17 --version || true
-
-echo "=== 环境变量 ==="
-env | grep -Ei 'clang|llvm|bpf' || true
-
-echo "=== OpenWrt 配置 ==="
-grep -E 'LLVM|CLANG|BPF' .config || true
 
 #===============================================
 
