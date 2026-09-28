@@ -34,7 +34,7 @@ if [[ "$release" =~ ^[0-9]{2}\.[0-9]{2}$ ]]; then
           echo "https://master.dl.sourceforge.net/project/openwrt-passwall-build/releases/packages-$release/$arch/$feed/packages.adb" >> files/etc/apk/repositories.d/customfeeds.list
         done        
         
-        # cat files/etc/apk/repositories.d/customfeeds.list
+        cat files/etc/apk/repositories.d/customfeeds.list
         
         # apk 公钥
         mkdir -p files/etc/apk/keys
@@ -42,7 +42,7 @@ if [[ "$release" =~ ^[0-9]{2}\.[0-9]{2}$ ]]; then
         wget -O files/etc/apk/keys/openwrt-passwall-build.pem \
             https://master.dl.sourceforge.net/project/openwrt-passwall-build/apk.pub
         
-        # cat files/etc/apk/keys/openwrt-passwall-build.pem
+        cat files/etc/apk/keys/openwrt-passwall-build.pem
     else
         # OPKG 第三方源
         mkdir -p files/etc/opkg
@@ -57,7 +57,7 @@ if [[ "$release" =~ ^[0-9]{2}\.[0-9]{2}$ ]]; then
           echo "src/gz $feed https://master.dl.sourceforge.net/project/openwrt-passwall-build/releases/packages-$release/$arch/$feed" >> files/etc/opkg/customfeeds.conf
         done
 
-        # cat files/etc/opkg/customfeeds.conf
+        cat files/etc/opkg/customfeeds.conf
         
         # OPKG 公钥
         mkdir -p files/etc/opkg/keys
@@ -65,7 +65,7 @@ if [[ "$release" =~ ^[0-9]{2}\.[0-9]{2}$ ]]; then
         wget -O files/etc/opkg/keys/0abda65a492b4887 \
             https://master.dl.sourceforge.net/project/openwrt-passwall-build/ipk.pub
 
-       # cat files/etc/opkg/keys/0abda65a492b4887     
+        cat files/etc/opkg/keys/0abda65a492b4887     
     fi
 fi
 
