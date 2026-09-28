@@ -15,6 +15,7 @@
 
 release=$(cat ../OpenWrtSet.json | jq -r .build.release)
 arch=$(cat ../OpenWrtSet.json | jq -r .build.arch)
+kmods=$(cat ../OpenWrtSet.json | jq -r .build.kmods)
 
 if [[ "$release" =~ ^[0-9]{2}\.[0-9]{2}$ ]]; then
     version="${release%%.*}"
@@ -24,6 +25,10 @@ if [[ "$release" =~ ^[0-9]{2}\.[0-9]{2}$ ]]; then
         mkdir -p files/etc/apk/repositories.d
         
         touch files/etc/apk/repositories.d/customfeeds.list
+
+        if [ -n "$kmods" ] && [ "$kmods" != "null" ]; then
+            echo "$kmods" >> files/etc/apk/repositories.d/customfeeds.list
+        fi
         
         for feed in passwall_luci passwall_packages passwall2; do
           echo "https://master.dl.sourceforge.net/project/openwrt-passwall-build/releases/packages-$release/$arch/$feed/packages.adb" >> files/etc/apk/repositories.d/customfeeds.list
@@ -43,6 +48,10 @@ if [[ "$release" =~ ^[0-9]{2}\.[0-9]{2}$ ]]; then
         mkdir -p files/etc/opkg
 
         touch files/etc/opkg/customfeeds.conf
+
+        if [ -n "$kmods" ] && [ "$kmods" != "null" ]; then
+            echo "src/gz my_kmods $kmods" >> files/etc/opkg/customfeeds.conf
+        fi
         
         for feed in passwall_luci passwall_packages passwall2; do
           echo "src/gz $feed https://master.dl.sourceforge.net/project/openwrt-passwall-build/releases/packages-$release/$arch/$feed" >> files/etc/opkg/customfeeds.conf
