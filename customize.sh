@@ -27,7 +27,7 @@ if [[ "$release" =~ ^[0-9]{2}\.[0-9]{2}$ ]]; then
         touch files/etc/apk/repositories.d/customfeeds.list
 
         if [ -n "$kmods" ] && [ "$kmods" != "null" ]; then
-            echo "$kmods" >> files/etc/apk/repositories.d/customfeeds.list
+            echo "$kmods/packages.adb" >> files/etc/apk/repositories.d/customfeeds.list
         fi
         
         for feed in passwall_luci passwall_packages passwall2; do
