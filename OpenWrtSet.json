@@ -30,9 +30,9 @@
     "build": {
         "target": "rax3000m",
         "version": "OpenWrt",
-        "branch": "immortalwrt-24.10.6",
-        "release":"24.10",
-        "kmods":"https://downloads.immortalwrt.org/releases/24.10.6/targets/mediatek/filogic/kmods/6.6.133-1-a8b93917f464536104594f27d870028d",
+        "branch": "openwrt-25.12.5",
+        "release":"25.12",
+        "kmods":"https://downloads.openwrt.org/releases/25.12.5/targets/mediatek/filogic/kmods/6.12.94-1-5a6c1f71be683ae9980b15d3ce73e24d",
         "arch":"aarch64_cortex-a53"
     },
     "config": {
