@@ -1,9 +1,5 @@
 #!/bin/bash
 
-sudo bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)"
-sudo -E apt-get -qq install clang llvm npm bc python3 xz-utils tar
-npm install -g pnpm
-
 chmod -R 777 ./
 ./scripts/feeds update -a 2>&1 | tee ../update.log
 if grep -E -i "^\s*error\s*:" ../update.log; then
