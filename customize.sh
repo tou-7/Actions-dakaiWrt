@@ -9,7 +9,7 @@
 #sed -i 's/root:.*/root:$1$tTPCBw1t$ldzfp37h5lSpO9VXk4uUE\/:18336:0:99999:7:::/g' package/base-files/files/etc/shadow
 #echo "makeJ1Model=true" >> $GITHUB_ENV
 #===============================================
-sudo -E apt-get -qq install npm
+sudo -E apt-get -qq install npm bc python3 xz-utils tar
 npm install -g pnpm
 #===============================================
 
