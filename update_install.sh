@@ -9,6 +9,7 @@ else
     rm -rf feeds/luci/applications/luci-app-mosdns
     rm -rf feeds/packages/net/{alist,adguardhome,mosdns,xray*,v2ray*,sing*,smartdns} feeds/packages/utils/v2dat feeds/packages/lang/golang
     git clone https://github.com/kenzok8/golang -b 1.26 feeds/packages/lang/golang
+    git clone https://github.com/QiuSimons/vmlinux-btf package/vmlinux-btf
     #===========================================
     ./scripts/feeds install -a 2>&1 | tee ../install.log
     if grep -E -i "^\s*error\s*:" ../install.log; then
