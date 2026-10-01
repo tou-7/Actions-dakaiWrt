@@ -28,7 +28,7 @@
         }
     },
     "build": {
-        "target": "rax3000m",
+        "target": "rax3000m_dae",
         "version": "OpenWrt",
         "branch": "openwrt-25.12.5",
         "release":"25.12",
