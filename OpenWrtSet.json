@@ -32,7 +32,6 @@
         "version": "OpenWrt",
         "branch": "openwrt-25.12.5",
         "release":"25.12",
-        "kmods":"https://downloads.openwrt.org/releases/25.12.5/targets/mediatek/filogic/kmods/6.12.94-1-5a6c1f71be683ae9980b15d3ce73e24d",
         "arch":"aarch64_cortex-a53"
     },
     "config": {
