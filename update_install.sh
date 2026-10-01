@@ -1,6 +1,7 @@
 #!/bin/bash
 
-sudo -E apt-get -qq install npm bc python3 xz-utils tar
+sudo bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)"
+sudo -E apt-get -qq install clang llvm npm bc python3 xz-utils tar
 npm install -g pnpm
 
 chmod -R 777 ./
