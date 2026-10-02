@@ -1,5 +1,7 @@
 #!/bin/bash
 
+echo "makeJ1Model=true" >> $GITHUB_ENV
+ 
 chmod -R 777 ./
 ./scripts/feeds update -a 2>&1 | tee ../update.log
 if grep -E -i "^\s*error\s*:" ../update.log; then
