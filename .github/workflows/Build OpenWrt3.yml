@@ -244,7 +244,8 @@ jobs:
           echo -e "$(($(nproc)+1)) thread compile"
           if [ ${{env.makeJ1Model}} == 'true' ]
           then
-            make -j1 V=s
+            cp ../makeJ1.sh makeJ1.sh
+            chmod +x ./makeJ1.sh && ./makeJ1.sh
           else
             make -j$(($(nproc)+1)) || make -j1 V=s
           fi
