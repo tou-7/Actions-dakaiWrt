@@ -1,4 +1,6 @@
-        sudo bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)"
+        # sudo bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)"
+        wget https://apt.llvm.org/llvm.sh
+        chmod +x llvm.sh && sudo ./llvm.sh all
         sudo -E apt-get -qq update
         sudo -E apt-get -qq install dwarves npm bc python3 xz-utils tar
         sudo -E apt-get -qq install build-essential clang flex bison g++ gawk \
