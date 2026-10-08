@@ -33,9 +33,11 @@ if [[ "$release" =~ ^[0-9]{2}\.[0-9]{2}$ ]]; then
         
         # apk 公钥
         mkdir -p files/etc/apk/keys
-        
-        wget -O files/etc/apk/keys/openwrt-passwall-build.pem \
-            https://master.dl.sourceforge.net/project/openwrt-passwall-build/apk.pub
+
+        mv ../keys/PassWallApk.pub files/etc/apk/keys/openwrt-passwall-build.pem
+
+        # wget -O files/etc/apk/keys/openwrt-passwall-build.pem \
+        #     https://master.dl.sourceforge.net/project/openwrt-passwall-build/apk.pub
         
         cat files/etc/apk/keys/openwrt-passwall-build.pem
     else
@@ -52,9 +54,11 @@ if [[ "$release" =~ ^[0-9]{2}\.[0-9]{2}$ ]]; then
         
         # OPKG 公钥
         mkdir -p files/etc/opkg/keys
+
+        mv ../keys/PassWallIpk.pub files/etc/opkg/keys/0abda65a492b4887
         
-        wget -O files/etc/opkg/keys/0abda65a492b4887 \
-            https://master.dl.sourceforge.net/project/openwrt-passwall-build/ipk.pub
+        # wget -O files/etc/opkg/keys/0abda65a492b4887 \
+        #     https://master.dl.sourceforge.net/project/openwrt-passwall-build/ipk.pub
 
         cat files/etc/opkg/keys/0abda65a492b4887     
     fi
