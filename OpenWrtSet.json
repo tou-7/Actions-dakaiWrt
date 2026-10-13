@@ -28,11 +28,11 @@
         }
     },
     "build": {
-        "target": "rax3000m",
+        "target": "r2s",
         "version": "OpenWrt",
-        "branch": "openwrt-24.10.8",
-        "release":"24.10",
-        "arch":"aarch64_cortex-a53"
+        "branch": "openwrt-25.12.5",
+        "release":"25.12",
+        "arch":"aarch64_generic"
     },
     "config": {
         "user": "tou-7",
