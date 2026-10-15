@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "makeJ1Model=true" >> $GITHUB_ENV
+# echo "makeJ1Model=true" >> $GITHUB_ENV
  
 chmod -R 777 ./
 ./scripts/feeds update -a 2>&1 | tee ../update.log
