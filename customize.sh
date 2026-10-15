@@ -34,7 +34,7 @@ if [[ "$release" =~ ^[0-9]{2}\.[0-9]{2}$ ]]; then
         cat package/base-files/files/etc/apk/repositories.d/customfeeds.list
         
         # apk 公钥
-        mkdir -p files/etc/apk/keys
+        mkdir -p package/base-files/files/etc/apk/keys
 
         mv ../keys/PassWallApk.pub package/base-files/files/etc/apk/keys/openwrt-passwall-build.pem
 
