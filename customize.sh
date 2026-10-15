@@ -28,6 +28,8 @@ if [[ "$release" =~ ^[0-9]{2}\.[0-9]{2}$ ]]; then
         for feed in passwall_luci passwall_packages passwall2; do
           echo "https://master.dl.sourceforge.net/project/openwrt-passwall-build/releases/packages-$release/$arch/$feed/packages.adb" >> files/etc/apk/repositories.d/customfeeds.list
         done        
+
+        echo "https://opkg.cooluc.com/openwrt-$release/$arch/packages.adb" >> files/etc/apk/repositories.d/customfeeds.list
         
         cat files/etc/apk/repositories.d/customfeeds.list
         
@@ -35,6 +37,8 @@ if [[ "$release" =~ ^[0-9]{2}\.[0-9]{2}$ ]]; then
         mkdir -p files/etc/apk/keys
 
         mv ../keys/PassWallApk.pub files/etc/apk/keys/openwrt-passwall-build.pem
+
+        mv ../keys/daeApk.pem files/etc/apk/keys/key-build.pem
 
         # wget -O files/etc/apk/keys/openwrt-passwall-build.pem \
         #     https://master.dl.sourceforge.net/project/openwrt-passwall-build/apk.pub
@@ -50,12 +54,16 @@ if [[ "$release" =~ ^[0-9]{2}\.[0-9]{2}$ ]]; then
           echo "src/gz $feed https://master.dl.sourceforge.net/project/openwrt-passwall-build/releases/packages-$release/$arch/$feed" >> files/etc/opkg/customfeeds.conf
         done
 
+        echo "src/gz openwrt_extras https://opkg.cooluc.com/openwrt-$release/$arch" >> files/etc/opkg/customfeeds.conf
+
         cat files/etc/opkg/customfeeds.conf
         
         # OPKG 公钥
         mkdir -p files/etc/opkg/keys
 
         mv ../keys/PassWallIpk.pub files/etc/opkg/keys/0abda65a492b4887
+
+        mv ../keys/daeIpk.pub files/etc/opkg/keys/65e5c9185ca12c26
         
         # wget -O files/etc/opkg/keys/0abda65a492b4887 \
         #     https://master.dl.sourceforge.net/project/openwrt-passwall-build/ipk.pub
