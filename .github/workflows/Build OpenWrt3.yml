@@ -181,6 +181,7 @@ jobs:
           fi
 
       - name: 创建软连接 (节约空间)
+        if: env.cancelWorkflow == 'false'
         env:
           DEBIAN_FRONTEND: noninteractive
         run: |
