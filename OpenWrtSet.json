@@ -28,7 +28,7 @@
         }
     },
     "build": {
-        "target": "r2s_dae",
+        "target": "r2s",
         "version": "OpenWrt",
         "branch": "openwrt-25.12.5",
         "release":"25.12",
