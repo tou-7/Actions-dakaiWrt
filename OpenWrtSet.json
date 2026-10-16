@@ -28,10 +28,10 @@
         }
     },
     "build": {
-        "target": "rax3000m_dae",
+        "target": "rax3000m",
         "version": "OpenWrt",
-        "branch": "immortalwrt-25.12.2",
-        "release":"25.12",
+        "branch": "openwrt-24.10.8",
+        "release":"24.10",
         "arch":"aarch64_cortex-a53"
     },
     "config": {
