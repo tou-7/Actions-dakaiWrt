@@ -70,7 +70,8 @@ if [[ "$release" =~ ^[0-9]{2}\.[0-9]{2}$ ]]; then
         # wget -O files/etc/opkg/keys/0abda65a492b4887 \
         #     https://master.dl.sourceforge.net/project/openwrt-passwall-build/ipk.pub
 
-        cat files/etc/opkg/keys/0abda65a492b4887     
+        # cat files/etc/opkg/keys/0abda65a492b4887
+        cat files/etc/opkg/keys/65e5c9185ca12c26
     fi
 fi
 
