@@ -1,5 +1,5 @@
 {
-    "Liunx": "ubuntu-latest",
+    "Liunx": "ubuntu-24.04",
     "select": {
         "credits":"感谢 kenzok8大哥 整理的插件",
         "Lienol": {
